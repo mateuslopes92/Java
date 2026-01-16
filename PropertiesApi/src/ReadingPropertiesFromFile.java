@@ -1,7 +1,7 @@
 import java.io.*;
 import java.util.*;
 
-public class Main {
+public class ReadingPropertiesFromFile {
     public static void main(String[] args) throws Exception {
         // create a reader object on the properties file
         FileReader reader = new FileReader("src/info.properties");
