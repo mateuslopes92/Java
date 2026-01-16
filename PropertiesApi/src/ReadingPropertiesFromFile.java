@@ -2,7 +2,7 @@ import java.io.*;
 import java.util.*;
 
 public class ReadingPropertiesFromFile {
-    public static void main(String[] args) throws Exception {
+    public Properties properties() throws Exception {
         // create a reader object on the properties file
         FileReader reader = new FileReader("src/resources/info.properties");
 
@@ -13,7 +13,9 @@ public class ReadingPropertiesFromFile {
         p.load(reader);
 
         // access properties data
-        System.out.println(p.getProperty("name"));
-        System.out.println(p.getProperty("email"));
+        // System.out.println(p.getProperty("name"));
+        // System.out.println(p.getProperty("email"));
+
+        return p;
     }
 }

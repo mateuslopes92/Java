@@ -2,7 +2,7 @@ import java.io.*;
 import java.util.*;
 
 public class CreatePropertiesFile {
-    public static void main(String[] args) throws Exception {
+    public void createInfoPropertiesFile() throws Exception {
         // create an instance of Properties
         Properties p = new Properties();
 
