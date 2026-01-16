@@ -14,6 +14,6 @@ public class Main {
 
         // access properties data
         System.out.println(p.getProperty("name"));
-        System.out.println(p.getProperty("password"));
+        System.out.println(p.getProperty("email"));
     }
 }
