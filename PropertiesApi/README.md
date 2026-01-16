@@ -16,7 +16,7 @@ Then we can use FileWritter to write the file.
 import java.io.*;
 import java.util.*;
 
-public class CreatePropertiesFile {
+public class java.CreatePropertiesFile {
     public static void main(String[] args) throws Exception {
         // create an instance of Properties
         Properties p = new Properties();
@@ -33,7 +33,7 @@ public class CreatePropertiesFile {
 }
 ```
 
-## Basic example reading properties from a file (ReadPropertiesFromFile.java)
+## Basic example reading properties from a file (ReadingPropertiesFromFile.java)
 As the creation we can simple create a file reader with FileReader Class
 Create a properties object from Properties Class and load it
 
@@ -42,7 +42,7 @@ Then we can do whatever we want, in this case im just printing it:
 import java.io.*;
 import java.util.*;
 
-public class ReadingPropertiesFromFile {
+public class java.ReadingPropertiesFromFile {
     public static void main(String[] args) throws Exception {
         // create a reader object on the properties file
         FileReader reader = new FileReader("src/info.properties");

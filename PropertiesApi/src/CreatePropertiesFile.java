@@ -12,7 +12,7 @@ public class CreatePropertiesFile {
                 "mateuslopes92@gmail.com");
 
         // store the properties to a file
-        p.store(new FileWriter("src/info.properties"),
+        p.store(new FileWriter("src/resources/info.properties"),
                 "Creating properties example");
     }
 }
