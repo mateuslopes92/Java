@@ -8,22 +8,44 @@ The Properties class represents a persistent set of properties. The Properties c
 - Properties object does not require external synchronization and Multiple threads can share a single Properties object.
 - Also, it can be used to retrieve the properties of the system.
 
-## Basic example
-Just creating an db.properties file and storing username and password:
-```
-username = student
-password = neverstop
-```
+## Basic example creating properties file (CreatePropertiesFile.java)
+We can create a properties file simple by just instantiating Properties Class and setting properties to it
+Then we can use FileWritter to write the file.
 
-Retrieving from the main class:
 ```
 import java.io.*;
 import java.util.*;
 
-public class Main {
+public class CreatePropertiesFile {
+    public static void main(String[] args) throws Exception {
+        // create an instance of Properties
+        Properties p = new Properties();
+
+        // add properties to it
+        p.setProperty("name", "Mateus Lopes");
+        p.setProperty("email",
+                "mateuslopes92@gmail.com");
+
+        // store the properties to a file
+        p.store(new FileWriter("src/info.properties"),
+                "Creating properties example");
+    }
+}
+```
+
+## Basic example reading properties from a file (ReadPropertiesFromFile.java)
+As the creation we can simple create a file reader with FileReader Class
+Create a properties object from Properties Class and load it
+
+Then we can do whatever we want, in this case im just printing it:
+```
+import java.io.*;
+import java.util.*;
+
+public class ReadingPropertiesFromFile {
     public static void main(String[] args) throws Exception {
         // create a reader object on the properties file
-        FileReader reader = new FileReader("src/db.properties");
+        FileReader reader = new FileReader("src/info.properties");
 
         // create properties object
         Properties p = new Properties();
@@ -32,9 +54,11 @@ public class Main {
         p.load(reader);
 
         // access properties data
-        System.out.println(p.getProperty("username"));
-        System.out.println(p.getProperty("password"));
+        System.out.println(p.getProperty("name"));
+        System.out.println(p.getProperty("email"));
     }
 }
 ```
+
+
 
