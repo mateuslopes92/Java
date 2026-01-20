@@ -9,10 +9,11 @@ public class Main {
 
         propertiesFile.createInfoPropertiesFile();
 
-        ReadingPropertiesFromFile infoProps = new ReadingPropertiesFromFile();
+        ReadingPropertiesFromFile propReader = new ReadingPropertiesFromFile();
+        Properties infoProps = propReader.properties();
 
-        System.out.println(infoProps.properties().getProperty("name"));
-        System.out.println(infoProps.properties().getProperty("email"));
+        System.out.println(infoProps.getProperty("name"));
+        System.out.println(infoProps.getProperty("email"));
 
         // get all the system properties
         Properties systemProperties = System.getProperties();
