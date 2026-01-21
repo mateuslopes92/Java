@@ -12,6 +12,8 @@ public class CreatePropertiesFile {
                 "mateuslopes92@gmail.com");
 
         // store the properties to a file
+        // creating this file for testing purposes
+        // resources is not a runtime folder, should have static files only
         p.store(new FileWriter("src/resources/info.properties"),
                 "Creating properties example");
     }
