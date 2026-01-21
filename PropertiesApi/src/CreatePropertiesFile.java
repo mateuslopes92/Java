@@ -3,10 +3,10 @@ import java.util.*;
 
 public class CreatePropertiesFile {
     public void createInfoPropertiesFile() throws Exception {
-        // create an instance of Properties
+        // Holds key-value configuration loaded from a properties file
         Properties p = new Properties();
 
-        // add properties to it
+        // Define configuration values (keys and values must be strings)
         p.setProperty("name", "Mateus Lopes");
         p.setProperty("email",
                 "mateuslopes92@gmail.com");

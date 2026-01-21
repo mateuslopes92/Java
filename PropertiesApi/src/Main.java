@@ -17,6 +17,14 @@ public class Main {
         //        System.out.println(infoProps.getProperty("name"));
         //        System.out.println(infoProps.getProperty("email"));
 
+        // Reading resources using getResourcesAsStream
+        Properties dbInfo = PropertiesLoader.load("db.properties");
+        System.out.println("----Database properties ----");
+        System.out.println(dbInfo.getProperty("db.url"));
+        System.out.println(dbInfo.getProperty("db.user"));
+        System.out.println("-----------------------------\n");
+
+
         // get all the system properties
         Properties systemProperties = System.getProperties();
         String javaVersion = systemProperties.getProperty("java.specification.version");
