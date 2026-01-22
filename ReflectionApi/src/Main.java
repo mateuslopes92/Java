@@ -44,7 +44,7 @@ public class Main {
 
         System.out.println();
 
-        System.out.println("-----Calling Cat Method Fields-----");
+        System.out.println("-----Calling Cat Methods-----");
         for(Method method: catMethods){
             if(method.getName().equals("meow")){
                 // same as set receives the object as first parameter
@@ -55,7 +55,23 @@ public class Main {
         }
         System.out.println("--------------------");
 
+        System.out.println();
 
+        System.out.println("-----Calling Private Cat Methods-----");
+        for(Method method: catMethods){
+            if(method.getName().equals("heyThisIsPrivate")){
+                // to make a private method accessible need to set the accessibility of the method
+                method.setAccessible(true);
+                // same as set receives the object as first parameter
+                // as the method dont receive parameters we dont need to pass additional parameters
+                // if has parameters is just add as following parameters
+                method.invoke(myCat);
+            }
+        }
+        System.out.println("--------------------");
 
+        System.out.println();
+
+        
     }
 }
