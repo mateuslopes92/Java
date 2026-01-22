@@ -20,3 +20,11 @@ Spring uses reflection to look at classes you created your own, and also to crea
 Can also use for testing, manipulating private fields to check if other methds works as supposed to be.
 
 
+## Down sides
+- Is easy to break things if dont know what you are doing.
+- Cant do any compile time optimization(As figure out and manipulate at runtime)
+
+## Final thoughts
+If you can do without reflections is best to avoid use cause your code will be faster, more robust and more testable.
+
+But if you have to, is a really good tool to know.
