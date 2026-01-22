@@ -27,7 +27,7 @@ public class Cat {
         System.out.println("Im public and static!");
     }
 
-    private static void thisIsAPrivateMethod(){
+    private static void thisIsAPrivateStaticMethod(){
         System.out.println("Im private and static!");
     }
 }
