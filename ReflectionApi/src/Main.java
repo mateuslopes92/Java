@@ -1,4 +1,5 @@
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 public class Main {
     public static void main(String[] args) throws Exception {
@@ -28,5 +29,17 @@ public class Main {
         }
         System.out.println("Name now is = " + myCat.getName());
         System.out.println("--------------------");
+
+        System.out.println();
+
+
+        // Getting all declared methods from a class
+        Method[] catMethods = myCat.getClass().getDeclaredMethods();
+        System.out.println("-----Cat Method Fields-----");
+        for(Method method: catMethods){
+            System.out.println(method.getName());
+        }
+        System.out.println("--------------------");
+
     }
 }
