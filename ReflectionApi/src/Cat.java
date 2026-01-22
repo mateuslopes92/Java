@@ -23,11 +23,11 @@ public class Cat {
         System.out.println("How did you call this??");
     }
 
-    public static void thisIsAPublicMethod(){
+    public static void thisIsAPublicStaticMethod(){
         System.out.println("Im public and static!");
     }
 
-    private static void thisIsAPRivateMethod(){
+    private static void thisIsAPrivateMethod(){
         System.out.println("Im private and static!");
     }
 }
