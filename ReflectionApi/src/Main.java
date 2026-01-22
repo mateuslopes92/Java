@@ -35,11 +35,27 @@ public class Main {
 
         // Getting all declared methods from a class
         Method[] catMethods = myCat.getClass().getDeclaredMethods();
+
         System.out.println("-----Cat Method Fields-----");
         for(Method method: catMethods){
             System.out.println(method.getName());
         }
         System.out.println("--------------------");
+
+        System.out.println();
+
+        System.out.println("-----Calling Cat Method Fields-----");
+        for(Method method: catMethods){
+            if(method.getName().equals("meow")){
+                // same as set receives the object as first parameter
+                // as the method dont receive parameters we dont need to pass additional parameters
+                // if has parameters is just add as following parameters
+                method.invoke(myCat);
+            }
+        }
+        System.out.println("--------------------");
+
+
 
     }
 }
