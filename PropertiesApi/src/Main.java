@@ -29,5 +29,13 @@ public class Main {
         Properties systemProperties = System.getProperties();
         String javaVersion = systemProperties.getProperty("java.specification.version");
         System.out.println("JAVA VERSION USING SYSTEM = " + javaVersion);
+
+        System.out.println();
+
+        // Getting all properties from XML properties file
+        System.out.println("----XML properties ----");
+        XmlProperties xmlProperties = new XmlProperties();
+        xmlProperties.read();
+        System.out.println("-----------------------------\n");
     }
 }
