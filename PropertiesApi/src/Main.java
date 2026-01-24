@@ -12,10 +12,12 @@ public class Main {
 
         // *READ PROPERTIES*
         // Uncomment bellow to see the properties loaded from the info.properties file created above
-        //        ReadingPropertiesFromFile propReader = new ReadingPropertiesFromFile();
-        //        Properties infoProps = propReader.properties();
-        //        System.out.println(infoProps.getProperty("name"));
-        //        System.out.println(infoProps.getProperty("email"));
+        System.out.println("----Reading from a created file properties ----");
+        ReadingPropertiesFromFile propReader = new ReadingPropertiesFromFile();
+        Properties infoProps = propReader.properties();
+        System.out.println(infoProps.getProperty("name"));
+        System.out.println(infoProps.getProperty("email"));
+        System.out.println("-----------------------------\n");
 
         // Reading resources using getResourcesAsStream
         Properties dbInfo = PropertiesLoader.load("db.properties");
@@ -26,11 +28,11 @@ public class Main {
 
 
         // get all the system properties
+        System.out.println("----System properties ----");
         Properties systemProperties = System.getProperties();
         String javaVersion = systemProperties.getProperty("java.specification.version");
         System.out.println("JAVA VERSION USING SYSTEM = " + javaVersion);
-
-        System.out.println();
+        System.out.println("-----------------------------\n");
 
         // Getting all properties from XML properties file
         System.out.println("----XML properties ----");
