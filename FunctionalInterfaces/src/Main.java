@@ -50,6 +50,5 @@ public class Main {
         // Predicate: receives something and return a boolean
         Predicate<Integer> pdc = x -> x % 2 == 0;
         System.out.println("Predicate: receives something and return boolean: 2 is even: " + pdc.test(2));
-
     }
 }
