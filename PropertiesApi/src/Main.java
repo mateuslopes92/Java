@@ -26,7 +26,6 @@ public class Main {
         System.out.println(dbInfo.getProperty("db.user"));
         System.out.println("-----------------------------\n");
 
-
         // get all the system properties
         System.out.println("----System properties ----");
         Properties systemProperties = System.getProperties();
