@@ -29,5 +29,9 @@ public class Main {
         Integer fncResult = fnc.apply(2);
         System.out.println("Function: receives a parameter and return the defined type: " + fncResult);
 
+        // BiFunction: receives 2 parameters and return one
+        BiFunction<Integer, Integer, Integer> biFnc = (x, y) -> x+y;
+        Integer biFncResult = biFnc.apply(2, 8);
+        System.out.println("BiFunction: two parameters and return one" + "2 + 8 = " +  biFncResult);
     }
 }
