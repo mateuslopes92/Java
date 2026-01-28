@@ -1,7 +1,4 @@
-import java.util.function.BiFunction;
-import java.util.function.Function;
-import java.util.function.IntFunction;
-import java.util.function.Supplier;
+import java.util.function.*;
 
 public class Main {
     public static void main(String[] args) {
@@ -46,5 +43,8 @@ public class Main {
         Integer splResult = spl.get();
         System.out.println("Supplier: dont receive nothing and return something -> " + splResult);
 
+        // Consumer: receive something and return nothing
+        Consumer<Integer> csm = x -> System.out.println("Consumer: receive something and return nothing " + x);
+        csm.accept(6);
     }
 }
