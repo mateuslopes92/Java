@@ -46,5 +46,10 @@ public class Main {
         // Consumer: receive something and return nothing
         Consumer<Integer> csm = x -> System.out.println("Consumer: receive something and return nothing " + x);
         csm.accept(6);
+
+        // Predicate: receives something and return a boolean
+        Predicate<Integer> pdc = x -> x % 2 == 0;
+        System.out.println("Predicate: receives something and return boolean: 2 is even: " + pdc.test(2));
+
     }
 }
