@@ -1,5 +1,6 @@
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.IntFunction;
 
 public class Main {
     public static void main(String[] args) {
@@ -33,5 +34,13 @@ public class Main {
         BiFunction<Integer, Integer, Integer> biFnc = (x, y) -> x+y;
         Integer biFncResult = biFnc.apply(2, 8);
         System.out.println("BiFunction: two parameters and return one" + "2 + 8 = " +  biFncResult);
+
+        // IntFunction: receives an integer(Ommited) and return any type
+        IntFunction<String> iFnc = x -> "IntFunction: receives an int and return anything, my int: " + x;
+        String iFncResult = iFnc.apply(5);
+        System.out.println(iFncResult);
+
+        
+
     }
 }
