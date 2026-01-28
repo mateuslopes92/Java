@@ -1,6 +1,7 @@
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.IntFunction;
+import java.util.function.Supplier;
 
 public class Main {
     public static void main(String[] args) {
@@ -40,7 +41,10 @@ public class Main {
         String iFncResult = iFnc.apply(5);
         System.out.println(iFncResult);
 
-        
+        // Supplier: dont receive nothing and return something
+        Supplier<Integer> spl = () -> 2;
+        Integer splResult = spl.get();
+        System.out.println("Supplier: dont receive nothing and return something -> " + splResult);
 
     }
 }
