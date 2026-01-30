@@ -15,7 +15,21 @@ public class Main {
         /**
          * Filtering Elements
          */
+        System.out.println("--------Filter--------");
         List<Car> sedanCars = cars.stream().filter(car -> car.type.equals("sedan")).toList();
         System.out.println("Filtering elements with stream(sedan cars): " + sedanCars);
+        System.out.println("----------------------");
+
+        System.out.println();
+
+        /**
+         * Map Function
+         */
+        System.out.println("--------Map--------");
+        List<String> carMakeList = cars.stream().map(car -> car.make).toList();
+        System.out.println("Mapping througth elements with streams(makes cars): " + carMakeList);
+        System.out.println("----------------------");
+
+
     }
 }
