@@ -1,4 +1,5 @@
 import java.util.List;
+import java.util.stream.Stream;
 
 public class Main {
     record Car(String type, String make, String model, Integer engineCapacity){}
@@ -30,6 +31,15 @@ public class Main {
         System.out.println("Mapping througth elements with streams(makes cars): " + carMakeList);
         System.out.println("----------------------");
 
+        System.out.println();
 
+        /**
+         * Flat Map Function
+         */
+        System.out.println("--------Flat Map--------");
+        // Make followed by model -> Audi, A5, BMW, 320
+        List<String> carMakeModelList = cars.stream().flatMap(car -> Stream.of(car.make, car.model)).toList();
+        System.out.println("Flat Mapping througth elements with streams(makes and model cars): " + carMakeModelList);
+        System.out.println("----------------------");
     }
 }
