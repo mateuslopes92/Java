@@ -63,12 +63,13 @@ public class Main {
          * This return a map with true and false values with his data
          */
         System.out.println("--------Partitioning by Collector--------");
-        // Make followed by model -> Audi, A5, BMW, 320
         Map<Boolean, List<Car>> partitionedCars = cars.stream().collect(Collectors.partitioningBy(car -> car.type().equals("sedan")));
         System.out.println("Cars partitioned by collector: " + partitionedCars);
         System.out.println("----------------------");
 
         System.out.println();
+
+
 
     }
 }
