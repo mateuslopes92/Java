@@ -69,7 +69,24 @@ public class Main {
 
         System.out.println();
 
-
+        /**
+         * Grouping by Collector
+         *
+         */
+        System.out.println("--------Grouping by Collector--------");
+        // (type (make, engineCapacity))
+        Map<String, Map<String, Integer>> groupedCars = cars
+                .stream()
+                .collect(Collectors.groupingBy(
+                        Car::type,
+                        Collectors.toMap(
+                                Car::make,
+                                Car::engineCapacity
+                        )
+                        )
+                );
+        System.out.println("Cars grouped by collector: " + groupedCars);
+        System.out.println("----------------------");
 
     }
 }
