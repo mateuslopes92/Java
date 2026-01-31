@@ -1,4 +1,5 @@
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 public class Main {
@@ -15,9 +16,13 @@ public class Main {
 
         /**
          * Filtering Elements
+         * - filter() receives a Predicate (Car -> boolean)
+         * - Only elements that return true are kept in the stream
+         * - Here: keep only cars whose type is "sedan"
          */
         System.out.println("--------Filter--------");
-        List<Car> sedanCars = cars.stream().filter(car -> car.type.equals("sedan")).toList();
+        Predicate<Car> isSedan = car -> car.type().equals("sedan");
+        List<Car> sedanCars = cars.stream().filter(isSedan).toList();
         System.out.println("Filtering elements with stream(sedan cars): " + sedanCars);
         System.out.println("----------------------");
 
@@ -25,6 +30,9 @@ public class Main {
 
         /**
          * Map Function
+         * - map() transforms each element into another value
+         * - One input produces exactly one output
+         * - Here: Car -> make (String)
          */
         System.out.println("--------Map--------");
         List<String> carMakeList = cars.stream().map(car -> car.make).toList();
@@ -35,6 +43,10 @@ public class Main {
 
         /**
          * Flat Map Function
+         * - flatMap() maps each element to a Stream
+         * - then flattens all streams into a single stream
+         * - Used when one element produces multiple values
+         * - Here: Car -> Stream(make, model)
          */
         System.out.println("--------Flat Map--------");
         // Make followed by model -> Audi, A5, BMW, 320
