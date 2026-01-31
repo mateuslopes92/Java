@@ -88,5 +88,19 @@ public class Main {
         System.out.println("Cars grouped by collector: " + groupedCars);
         System.out.println("----------------------");
 
+        System.out.println();
+
+        /**
+         * Parallel Streams
+         * - Parallel by default is false, so we can use parallelStream
+         * - Execute not only in main thread but in other threads
+         * - To model the transformation we can use `.sequential()` that removes parallel support to the operation
+         * - And to `.parallel()` which enables on the fly if have a sequential stream
+         */
+        System.out.println("--------Parallel Streams--------");
+        cars.parallelStream().forEach(e -> {
+            System.out.println("Running parallel streams: " + e);
+        });
+        System.out.println("----------------------");
     }
 }
