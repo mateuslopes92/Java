@@ -1,5 +1,7 @@
 import java.util.List;
+import java.util.Map;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Main {
@@ -53,5 +55,20 @@ public class Main {
         List<String> carMakeModelList = cars.stream().flatMap(car -> Stream.of(car.make, car.model)).toList();
         System.out.println("Flat Mapping througth elements with streams(makes and model cars): " + carMakeModelList);
         System.out.println("----------------------");
+
+        System.out.println();
+
+        /**
+         * Partitioning by Collector
+         * This return a map with true and false values with his data
+         */
+        System.out.println("--------Partitioning by Collector--------");
+        // Make followed by model -> Audi, A5, BMW, 320
+        Map<Boolean, List<Car>> partitionedCars = cars.stream().collect(Collectors.partitioningBy(car -> car.type().equals("sedan")));
+        System.out.println("Cars partitioned by collector: " + partitionedCars);
+        System.out.println("----------------------");
+
+        System.out.println();
+
     }
 }
