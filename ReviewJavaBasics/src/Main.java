@@ -4,17 +4,11 @@ public class Main {
     public static void main(String[] args) {
         Inventory inventory = new Inventory();
 
-        Item macbook = new Item(
-    "Macbook",
-    2
-        );
-        Item iPhone = new Item(
-    "iPhone 16 Pro Max",
-    1
-        );
+        Item genericItem = new Item("Macbook",2);
+        Fruit fruit = new Fruit("Apple",10, "Fuji");
 
-        inventory.addItem(macbook);
-        inventory.addItem(iPhone);
+        inventory.addItem(genericItem);
+        inventory.addItem(fruit);
 
         inventory.displayInventory();
     }
