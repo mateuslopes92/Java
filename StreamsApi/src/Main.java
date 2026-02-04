@@ -1,6 +1,8 @@
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -91,16 +93,21 @@ public class Main {
         System.out.println();
 
         /**
-         * Parallel Streams
+         * Parallel Streams + Consumer
          * - Parallel by default is false, so we can use parallelStream
          * - Execute not only in main thread but in other threads
          * - To model the transformation we can use `.sequential()` that removes parallel support to the operation
          * - And to `.parallel()` which enables on the fly if have a sequential stream
          */
         System.out.println("--------Parallel Streams--------");
-        cars.parallelStream().forEach(e -> {
-            System.out.println("Running parallel streams: " + e);
-        });
+        // Consumer<Car> → takes a Car, returns nothing
+        Consumer<Car> printCar = car ->
+                System.out.println("Running parallel streams: Consuming car: " + car);
+        cars.parallelStream().forEach(printCar);
         System.out.println("----------------------");
+
+        System.out.println();
+
+
     }
 }
