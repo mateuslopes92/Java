@@ -3,6 +3,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -120,5 +121,23 @@ public class Main {
         System.out.println("------------------------");
 
         System.out.println();
+
+        /**
+         * UnaryOperator
+         */
+        System.out.println("--------UnaryOperator--------");
+        // UnaryOperator<Car> → Car in, Car out
+        UnaryOperator<Car> upgradeEngine = car ->
+                new Car(
+                        car.type(),
+                        car.make(),
+                        car.model(),
+                        car.engineCapacity() + 200
+                );
+        List<Car> upgradedCars = cars.stream()
+                .map(upgradeEngine)
+                .toList();
+        System.out.println("Cars after engine upgrade with unary operator: " + upgradedCars);
+        System.out.println("-----------------------------");
     }
 }
