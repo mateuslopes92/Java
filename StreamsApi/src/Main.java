@@ -108,6 +108,17 @@ public class Main {
 
         System.out.println();
 
+        /**
+         * Supplier with streams
+         */
+        System.out.println("--------Supplier--------");
+        // Supplier<Car> → produces a Car, no input
+        Supplier<Car> carSupplier = () ->
+                new Car("sedan", "Honda", "Civic", 2000);
+        Car suppliedCar = carSupplier.get();
+        System.out.println("Car supplied by Supplier: " + suppliedCar);
+        System.out.println("------------------------");
 
+        System.out.println();
     }
 }
