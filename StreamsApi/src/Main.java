@@ -1,9 +1,6 @@
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
-import java.util.function.UnaryOperator;
+import java.util.function.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -139,5 +136,16 @@ public class Main {
                 .toList();
         System.out.println("Cars after engine upgrade with unary operator: " + upgradedCars);
         System.out.println("-----------------------------");
+
+        System.out.println();
+
+        System.out.println("--------BinaryOperator--------");
+        // BinaryOperator<Integer> → combine two Integers into one
+        BinaryOperator<Integer> sumEngines = Integer::sum;
+        int totalEngineCapacity = cars.stream()
+                .map(Car::engineCapacity)
+                .reduce(0, sumEngines);
+        System.out.println("Total engine capacity: " + totalEngineCapacity);
+        System.out.println("------------------------------");
     }
 }
