@@ -5,12 +5,12 @@ public class Main {
         Inventory inventory = new Inventory();
 
         Item genericItem = new Item("Macbook",2);
-        Fruit fruit = new Fruit("Apple",10, "Fuji");
-        Weapon weapon = new Weapon("Sword", 2, 75, "Melee");
+//        Fruit fruit = new Fruit("Apple",10, "Fuji");
+//        Weapon weapon = new Weapon("Sword", 2, 75, "Melee");
 
         inventory.addItem(genericItem);
-        inventory.addItem(fruit);
-        inventory.addItem(weapon);
+        inventory.addItem("Apple",10, "Fuji");
+        inventory.addItem("Sword", 2, 75, "Melee");
 
         inventory.displayInventory();
     }

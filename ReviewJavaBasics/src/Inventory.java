@@ -11,6 +11,17 @@ public class Inventory {
         items.add(item);
     }
 
+    // Using overload as an example to polymorphism in compile time
+    public void addItem(String name, int quantity, String type){
+        items.add(new Fruit(name, quantity, type));
+    }
+
+    // Using overload as an example to polymorphism in compile time
+    public void addItem(String name, int quantity, int damage, String type){
+        items.add(new Weapon(name, quantity, damage, type));
+    }
+
+
     public void displayInventory(){
         for(Item item : items){
             System.out.println(item.toString());
