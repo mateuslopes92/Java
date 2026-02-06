@@ -14,4 +14,13 @@ public class Item {
     public int getQuantity() {
         return quantity;
     }
+
+    /**
+     * Runtime polymorphism(dynamic)
+     * @return String
+     */
+    @Override
+    public String toString(){
+        return "Item: " + name + ", Quantity: " + quantity;
+    }
 }

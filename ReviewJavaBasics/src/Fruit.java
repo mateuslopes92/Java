@@ -5,4 +5,13 @@ public class Fruit extends Item {
         super(name, quantity);
         this.type = type;
     }
+
+    /**
+     * Runtime polymorphism(dynamic)
+     * @return String
+     */
+    @Override
+    public String toString(){
+        return "Fruit: " + getName() + ", Quantity: " + getQuantity() + ", Type: " + type;
+    }
 }

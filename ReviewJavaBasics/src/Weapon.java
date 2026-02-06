@@ -15,4 +15,13 @@ public class Weapon extends Item {
     public String getType(){
         return type;
     }
+
+    /**
+     * Runtime polymorphism(dynamic)
+     * @return String
+     */
+    @Override
+    public String toString(){
+        return "Fruit: " + getName() + ", Quantity: " + getQuantity() + ", Damage: " + getDamage() + ", Type: " + getType();
+    }
 }
