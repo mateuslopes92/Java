@@ -85,8 +85,8 @@ cars.stream().flatMap(car -> Stream.of(car.make(), car.model()))
 Splits data into **true / false groups**.
 
 ```java
-Map<Boolean, List<Car>> partitionedCars = 
-    cars.stream().collect(Collectors.partitioningBy(isSedan));
+Map<Boolean, List<Car>> partitionedCars =
+        cars.stream().collect(Collectors.partitioningBy(isSedan));
 ```
 
 ---
@@ -97,10 +97,10 @@ Groups elements by a key.
 
 ```java
 Map<String, Map<String, Integer>> groupedCars = cars.stream()
-    .collect(Collectors.groupingBy(
-        Car::type,
-        Collectors.toMap(Car::make, Car::engineCapacity)
-    ));
+        .collect(Collectors.groupingBy(
+                Car::type,
+                Collectors.toMap(Car::make, Car::engineCapacity)
+        ));
 ```
 
 ---
@@ -121,13 +121,74 @@ Notes:
 
 ---
 
+## Functional Interfaces with Streams
+
+This project also demonstrates the most common **functional interfaces** used with Streams.
+
+### Consumer<T>
+
+Consumes a value and returns nothing.
+
+```java
+Consumer<Car> printCar = car -> System.out.println(car);
+cars.forEach(printCar);
+```
+
+* Signature: `T -> void`
+* Used for side effects (printing, logging)
+
+---
+
+### Supplier<T>
+
+Produces values without receiving input.
+
+```java
+Supplier<Car> carSupplier = () -> new Car("sedan", "Honda", "Civic", 2000);
+Car newCar = carSupplier.get();
+```
+
+* Signature: `() -> T`
+* Commonly used to create objects lazily
+
+---
+
+### UnaryOperator<T>
+
+Transforms a value **into the same type**.
+
+```java
+UnaryOperator<Car> upgradeEngine = car ->
+    new Car(car.type(), car.make(), car.model(), car.engineCapacity() + 200);
+```
+
+* Signature: `T -> T`
+* Special case of `Function<T, T>`
+
+---
+
+### BinaryOperator<T>
+
+Combines two values into one.
+
+```java
+BinaryOperator<Integer> sumEngines = Integer::sum;
+
+int totalEngineCapacity = cars.stream()
+    .map(Car::engineCapacity)
+    .reduce(0, sumEngines);
+```
+
+* Signature: `(T, T) -> T`
+* Often used with `reduce()`
+
+---
+
 ## Summary
 
-* Streams process data, they don’t store it
-* `filter` removes elements
-* `map` transforms elements
-* `flatMap` expands elements
-* Collectors transform streams into Maps or Lists
-* Parallel streams use multiple threads
+* `Consumer` performs actions
+* `Supplier` creates values
+* `UnaryOperator` transforms values
+* `BinaryOperator` combines values
 
-This project is meant to be a **hands-on reference** for learning Java Streams step by step.
+Together, these interfaces form the foundation of Java Streams and functional programming.
