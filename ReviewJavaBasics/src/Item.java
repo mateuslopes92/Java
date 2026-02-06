@@ -16,7 +16,7 @@ public class Item {
     }
 
     /**
-     * Runtime polymorphism(dynamic)
+     * Runtime polymorphism(dynamic) using Override
      * @return String
      */
     @Override

@@ -17,7 +17,7 @@ public class Weapon extends Item {
     }
 
     /**
-     * Runtime polymorphism(dynamic)
+     * Runtime polymorphism(dynamic) using Override
      * @return String
      */
     @Override

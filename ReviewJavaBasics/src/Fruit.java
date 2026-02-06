@@ -7,7 +7,7 @@ public class Fruit extends Item {
     }
 
     /**
-     * Runtime polymorphism(dynamic)
+     * Runtime polymorphism(dynamic) using Override
      * @return String
      */
     @Override
