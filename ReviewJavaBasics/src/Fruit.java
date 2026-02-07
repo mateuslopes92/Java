@@ -6,6 +6,10 @@ public class Fruit extends Item {
         this.type = type;
     }
 
+    public String getType() {
+        return type;
+    }
+
     /**
      * Runtime polymorphism(dynamic) using Override
      * @return String
