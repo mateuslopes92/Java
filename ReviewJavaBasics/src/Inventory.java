@@ -24,16 +24,16 @@ public class Inventory {
 
     public void displayInventory(){
         for(Item item : items){
-            System.out.println(item.toString());
+            item.displayInfo();
         }
     }
 
     public void displayInventory(String type){
         for(Item item : items){
             if(item instanceof Fruit && ((Fruit) item).getType().equalsIgnoreCase(type)){
-                System.out.println(item.toString());
+                item.displayInfo();
             } else if (item instanceof Weapon && ((Weapon) item).getType().equalsIgnoreCase((type))){
-                System.out.println(item.toString());
+                item.displayInfo();
             }
         }
     }

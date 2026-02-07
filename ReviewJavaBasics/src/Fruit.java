@@ -15,7 +15,7 @@ public class Fruit extends Item {
      * @return String
      */
     @Override
-    public String toString(){
-        return "Fruit: " + getName() + ", Quantity: " + getQuantity() + ", Type: " + type;
+    public void displayInfo(){
+        System.out.println("Fruit: " + getName() + ", Quantity: " + getQuantity() + ", Type: " + type);
     }
 }

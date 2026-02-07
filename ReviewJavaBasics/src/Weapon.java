@@ -21,7 +21,7 @@ public class Weapon extends Item {
      * @return String
      */
     @Override
-    public String toString(){
-        return "Fruit: " + getName() + ", Quantity: " + getQuantity() + ", Damage: " + getDamage() + ", Type: " + getType();
+    public void displayInfo(){
+        System.out.println( "Weapon: " + getName() + ", Quantity: " + getQuantity() + ", Damage: " + getDamage() + ", Type: " + getType());
     }
 }
