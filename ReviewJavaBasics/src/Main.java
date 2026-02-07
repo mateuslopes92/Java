@@ -13,5 +13,9 @@ public class Main {
         inventory.addItem("Sword", 2, 75, "Melee");
 
         inventory.displayInventory();
+        System.out.println();
+
+        // Printing by type with function displayInventory with overload
+        inventory.displayInventory("Fuji");
     }
 }

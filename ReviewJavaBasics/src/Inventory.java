@@ -27,4 +27,14 @@ public class Inventory {
             System.out.println(item.toString());
         }
     }
+
+    public void displayInventory(String type){
+        for(Item item : items){
+            if(item instanceof Fruit && ((Fruit) item).getType().equalsIgnoreCase(type)){
+                System.out.println(item.toString());
+            } else if (item instanceof Weapon && ((Weapon) item).getType().equalsIgnoreCase((type))){
+                System.out.println(item.toString());
+            }
+        }
+    }
 }
