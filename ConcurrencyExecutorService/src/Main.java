@@ -1,21 +1,19 @@
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+/**
+ * Types of threads(4 basics)
+ * FixedThreadPool (Fixed number of threads(safe - blocking queue)
+ * CachedThreadPool (Not have fixed number, not have queue, have synchronous queue), uses free threads or create a thread if dont have a free one, kill threads idle when more than 60 seconds wth no execution
+ * ScheduledThreadPool (Tasks that want to schedule after certain a delay/rate) more threads area created if required - Uses a delay queue
+ * SingleThreadExecutor
+ */
 
 public class Main {
     public static void main(String[] args) {
+        // FixedThreadPool
+        FixedThreadPool runFixedThreadPool = new FixedThreadPool();
+        runFixedThreadPool.execute();
 
-        // Example of simple task running with a poolsize based on available processors
-        // Get count of available cores (eg. 4 cores in a processor)
-        int coreCount = Runtime.getRuntime().availableProcessors();
-
-        // CPU intensive - pool size ideal is CPU core count - other apps may use same CPU
-        // IO Intensive(Database, Network) - pool size ideal is higher - Exact number depends on rate of task submissions and average task wait time
-        // IO -> too many threads will increase memory consumption
-        try (ExecutorService service = Executors.newFixedThreadPool(coreCount)) {
-            // Submit the tasks for execution
-            for (int i = 0; i < 100; i++) {
-                service.execute(new CpuIntensiveTask());
-            }
-        }
+        // CachedThreadPool
+        CachedThreadPool cachedThreadPool = new CachedThreadPool();
+        cachedThreadPool.execute();
     }
 }
