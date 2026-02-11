@@ -9,7 +9,7 @@ import java.util.concurrent.ScheduledExecutorService;
  */
 
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         // FixedThreadPool
 //        FixedThreadPool runFixedThreadPool = new FixedThreadPool();
 //        runFixedThreadPool.execute();
@@ -29,7 +29,10 @@ public class Main {
 //        mySingleThreadExecutor.execute();
 
         // RejectedExecutionException
-        RejectorExecution rejectorExecution = new RejectorExecution();
-        rejectorExecution.execute();
+//        RejectorExecution rejectorExecution = new RejectorExecution();
+//        rejectorExecution.execute();
+
+        // ExecutorShutdown
+        ExecutorShutdown.runExample();
     }
 }
