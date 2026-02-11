@@ -25,7 +25,11 @@ public class Main {
 //        scheduledThreadPool.execute();
 
         // SingleThreadExecutor
-        MySingleThreadExecutor mySingleThreadExecutor = new MySingleThreadExecutor();
-        mySingleThreadExecutor.execute();
+//        MySingleThreadExecutor mySingleThreadExecutor = new MySingleThreadExecutor();
+//        mySingleThreadExecutor.execute();
+
+        // RejectedExecutionException
+        RejectorExecution rejectorExecution = new RejectorExecution();
+        rejectorExecution.execute();
     }
 }
