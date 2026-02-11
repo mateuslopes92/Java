@@ -33,6 +33,9 @@ public class Main {
 //        rejectorExecution.execute();
 
         // ExecutorShutdown
-        ExecutorShutdown.runExample();
+//        ExecutorShutdown.runExample();
+
+        // Callable
+        CallableExample.run();
     }
 }
