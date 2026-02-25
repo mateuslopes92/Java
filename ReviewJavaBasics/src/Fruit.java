@@ -1,13 +1,24 @@
-public class Fruit extends Item {
+public class Fruit implements ItemStuff {
+    private int quantity;
+    private String name;
     private String type;
 
     public Fruit(String name, int quantity, String type) {
-        super(name, quantity);
+        this.name = name;
+        this.quantity = quantity;
         this.type = type;
     }
 
     public String getType() {
         return type;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getQuantity() {
+        return quantity;
     }
 
     /**
