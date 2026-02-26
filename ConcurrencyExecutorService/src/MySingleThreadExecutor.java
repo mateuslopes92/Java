@@ -6,6 +6,7 @@ public class MySingleThreadExecutor {
     public void execute() {
         // Creates an executor that uses a single worker thread
         // Tasks are executed sequentially, one at a time
+        // Similar to a fixed thread pool but with only one thread.
         try (ExecutorService service = Executors.newSingleThreadExecutor()) {
 
             // Submit multiple tasks
