@@ -52,6 +52,7 @@ public class ReentrantReadWriteLockExample {
             }
         };
 
+        //new Thread(writeTask, "Writer-1").start();
         new Thread(readTask, "Reader-1").start();
         new Thread(readTask, "Reader-2").start();
         new Thread(writeTask, "Writer-1").start();
