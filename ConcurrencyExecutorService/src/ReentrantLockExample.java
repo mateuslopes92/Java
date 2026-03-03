@@ -1,6 +1,9 @@
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+// Single lock
+// Only 1 thread at a time
+// Good for exclusive access
 public class ReentrantLockExample {
     // the ReentrantLock is a lock which if a thread has locked the lock
     // can lock again and again
