@@ -1,4 +1,4 @@
-# Java Concurrency (ExecutorService, Callable & Future, Locks)
+# Java Concurrency (ExecutorService, Callable & Future, Locks and Atomic Variables)
 
 This project contains practical examples of Java Concurrency concepts including:
 
@@ -101,7 +101,7 @@ Proper shutdown is critical to avoid resource leaks.
 Two main approaches:
 ```java
 executor.shutdown(); // orderly shutdown
-``` 
+```
 ```java
 executor.shutdownNow(); // attempts to stop all running tasks
 ```
@@ -132,7 +132,7 @@ Uses synchronized method.
 public synchronized void display() {
     System.out.println(Thread.currentThread().getName());
 }
-``` 
+```
 
 ### 10. ReentrantLock (ReentrantLockExample.java)
 
