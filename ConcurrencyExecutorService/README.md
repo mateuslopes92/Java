@@ -202,62 +202,59 @@ public void increment() {
 }
 ```
 
-Behavior
+#### Behavior
 
-Multiple threads can increment the same counter concurrently
-
-Each increment is atomic
-
-No explicit locking required
-
-Final result remains consistent
+- Multiple threads can increment the same counter concurrently
+- Each increment is atomic
+- No explicit locking required
+- Final result remains consistent
 
 Example expected result with two threads:
-
+```aiignore
 100,000,000 * 2 = 200,000,000
+```
+
 
 Use Atomic classes when you need simple atomic operations without the overhead of locks.
 
-Main.java
+---
+
+### 13. Main.java
 
 The Main.java class serves as an entry point to test and experiment with the different concurrency implementations.
 
 You can:
 
-Execute executor examples
+- Execute executor examples
+- Run Callable/Future logic
+- Test locking mechanism
+- Test atomic variables
+- Observe thread behavior
 
-Run Callable/Future logic
+---
 
-Test locking mechanisms
+### Summary of Concepts
+| Concept                  | Purpose                       |
+| ------------------------ | ----------------------------- |
+| ExecutorService          | Manages thread pools          |
+| FixedThreadPool          | Fixed number of threads       |
+| CachedThreadPool         | Dynamic thread creation       |
+| SingleThreadExecutor     | Sequential execution          |
+| ScheduledExecutorService | Delayed/periodic execution    |
+| Callable                 | Returns result from task      |
+| Future                   | Holds async result            |
+| ReentrantLock            | Explicit mutual exclusion     |
+| ReentrantReadWriteLock   | Read-write separation         |
+| AtomicInteger            | Lock-free thread-safe counter |
+| shutdown()               | Graceful termination          |
+| shutdownNow()            | Immediate termination attempt |
 
-Test atomic variables
 
-Observe thread behavior
+## Important Notes
 
-Summary of Concepts
-Concept	Purpose
-ExecutorService	Manages thread pools
-FixedThreadPool	Fixed number of threads
-CachedThreadPool	Dynamic thread creation
-SingleThreadExecutor	Sequential execution
-ScheduledExecutorService	Delayed/periodic execution
-Callable	Returns result from task
-Future	Holds async result
-ReentrantLock	Explicit mutual exclusion
-ReentrantReadWriteLock	Read-write separation
-AtomicInteger	Lock-free thread-safe counter
-shutdown()	Graceful termination
-shutdownNow()	Immediate termination attempt
-Important Notes
-
-Always shutdown ExecutorService.
-
-Always unlock in finally block.
-
-Prefer thread pools over manual thread creation.
-
-Use ReadWriteLock when reads >> writes.
-
-Use Atomic classes when you only need atomic operations.
-
-Avoid blocking calls inside large thread pools unnecessarily.
+- Always shutdown ExecutorService.
+- Always unlock in finally block.
+- Prefer thread pools over manual thread creation.
+- Use ReadWriteLock when reads >> writes.
+- Use Atomic classes when you only need atomic operations.
+- Avoid blocking calls inside large thread pools unnecessarily.
