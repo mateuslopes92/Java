@@ -48,3 +48,25 @@ import java.lang.annotation.Target;
 public @interface VeryImportant {
 }
 ```
+
+### Processing the Annotation
+```java
+public class Main {
+    public static void main(String[] args) {
+
+        Dog myDog = new Dog("Jayne");
+        Cat myCat = new Cat("Mary");
+
+        // Processing Annotation
+        // Look at the class and check weather the class was marked with VeryImportant annotation
+        // We can do whatever we want if sees the annotation on that class
+        // The class has the annotation not the object
+//       if (myDog.getClass().isAnnotationPresent(VeryImportant.class)){
+        if (myCat.getClass().isAnnotationPresent(VeryImportant.class)){
+           System.out.println("This thing is very important!");
+       } else {
+           System.out.println("This thing is not very important!");
+       }
+    }
+}
+```
