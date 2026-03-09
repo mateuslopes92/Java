@@ -7,6 +7,7 @@ public class Dog {
         this.name = name;
     }
 
+    @VeryImportant
     public void bark(){
         System.out.println("Ruf!");
     }
