@@ -1,3 +1,6 @@
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 public class Main {
@@ -13,8 +16,21 @@ public class Main {
 //       if (myDog.getClass().isAnnotationPresent(VeryImportant.class)){
         if (myCat.getClass().isAnnotationPresent(VeryImportant.class)){
            System.out.println("This thing is very important!");
-       } else {
+        } else {
            System.out.println("This thing is not very important!");
-       }
+        }
+
+        // Running method only annotation
+        for (Method method : myDog.getClass().getDeclaredMethods()){
+            if(method.isAnnotationPresent(RunImmediately.class)){
+                try {
+                    method.invoke(myDog);
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException(e);
+                } catch (InvocationTargetException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
     }
 }
