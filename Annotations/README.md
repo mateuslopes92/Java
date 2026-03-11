@@ -104,4 +104,75 @@ for (Method method : myDog.getClass().getDeclaredMethods()){
 }
 ```
 
-## 
+## Annotation Parameters
+We can add parameters to our annotation by adding a field to it
+NOTE: The fields in a annotation should be a method, but it acts like a field
+
+```java
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+public @interface RunImmediately {
+    int times(); // we need to make a method but it acts like a normal field
+}
+
+```
+
+Then we can add the parameter where the annotation is being called
+Is just pass as parameter to our annotation `@RunImmediately(times = 3)`
+```java
+@VeryImportant
+public class Dog {
+    String name;
+    int age;
+
+    public Dog(String name){
+        this.name = name;
+    }
+
+//    @VeryImportant
+    @RunImmediately(times = 3)
+    public void bark(){
+        System.out.println("Ruf!");
+    }
+
+    public void eat(){
+        System.out.println("Munch");
+    }
+}
+```
+
+Then on our main class we can check the annotation parameter and do whatever we want
+
+```java
+// Running method only annotation
+// checking annotation parameters
+for (Method method : myDog.getClass().getDeclaredMethods()){
+    if(method.isAnnotationPresent(RunImmediately.class)){
+        try {
+            RunImmediately annotation = method.getAnnotation(RunImmediately.class);
+
+            for(int i = 0; i < annotation.times(); i++){
+                method.invoke(myDog);
+            }
+            
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        } catch (InvocationTargetException e) {
+            throw new RuntimeException(e);
+        }
+    }
+}
+```
+
+### Important notes about annotation parameters
+- Should be a primitive type 
+- Class type
+- String
+- or an array of the above eg.(`int[] times()`)
+- You can specify a default value like: `int times() default 1`
+- If you dont have a default you must pass the parameter when using the annotation
