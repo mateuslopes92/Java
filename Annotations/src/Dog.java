@@ -8,7 +8,7 @@ public class Dog {
     }
 
 //    @VeryImportant
-    @RunImmediately
+    @RunImmediately(times = 3)
     public void bark(){
         System.out.println("Ruf!");
     }
