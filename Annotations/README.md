@@ -70,3 +70,38 @@ public class Main {
     }
 }
 ```
+
+## Method only Annotation
+The annotation @RunImmediately is to run only on methods example 
+
+```java
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+public @interface RunImmediately {
+
+}
+```
+
+In our main class we verify if the method is annotated with that annotation and run the method if is
+
+```java
+// Running method only annotation
+for (Method method : myDog.getClass().getDeclaredMethods()){
+    if(method.isAnnotationPresent(RunImmediately.class)){
+        try {
+            method.invoke(myDog);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        } catch (InvocationTargetException e) {
+            throw new RuntimeException(e);
+        }
+    }
+}
+```
+
+## 
