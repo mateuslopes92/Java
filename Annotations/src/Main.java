@@ -21,10 +21,16 @@ public class Main {
         }
 
         // Running method only annotation
+        // checking annotation parameters
         for (Method method : myDog.getClass().getDeclaredMethods()){
             if(method.isAnnotationPresent(RunImmediately.class)){
                 try {
-                    method.invoke(myDog);
+                    RunImmediately annotation = method.getAnnotation(RunImmediately.class);
+
+                    for(int i = 0; i < annotation.times(); i++){
+                        method.invoke(myDog);
+                    }
+
                 } catch (IllegalAccessException e) {
                     throw new RuntimeException(e);
                 } catch (InvocationTargetException e) {
