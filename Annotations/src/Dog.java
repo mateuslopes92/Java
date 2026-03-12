@@ -1,6 +1,9 @@
 @VeryImportant
 public class Dog {
+
+    @ImportantString
     String name;
+
     int age;
 
     public Dog(String name){
