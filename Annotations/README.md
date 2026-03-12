@@ -71,8 +71,10 @@ public class Main {
 }
 ```
 
+---
+
 ## Method only Annotation
-The annotation @RunImmediately is to run only on methods example 
+The annotation @RunImmediately is to run only on methods example
 
 ```java
 import java.lang.annotation.ElementType;
@@ -103,6 +105,8 @@ for (Method method : myDog.getClass().getDeclaredMethods()){
     }
 }
 ```
+
+---
 
 ## Annotation Parameters
 We can add parameters to our annotation by adding a field to it
@@ -159,7 +163,7 @@ for (Method method : myDog.getClass().getDeclaredMethods()){
             for(int i = 0; i < annotation.times(); i++){
                 method.invoke(myDog);
             }
-            
+
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         } catch (InvocationTargetException e) {
@@ -170,9 +174,13 @@ for (Method method : myDog.getClass().getDeclaredMethods()){
 ```
 
 ### Important notes about annotation parameters
-- Should be a primitive type 
+- Should be a primitive type
 - Class type
 - String
 - or an array of the above eg.(`int[] times()`)
 - You can specify a default value like: `int times() default 1`
 - If you dont have a default you must pass the parameter when using the annotation
+
+---
+
+## Annotation for fields
