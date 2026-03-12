@@ -1,3 +1,4 @@
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -38,5 +39,21 @@ public class Main {
                 }
             }
         }
+
+        // Checking for fields Annotation
+        for (Field field : myDog.getClass().getDeclaredFields()){
+            if(field.isAnnotationPresent(ImportantString.class)){
+                Object objectValue = null;
+                try {
+                    objectValue = field.get(myDog);
+                    if(objectValue instanceof String stringValue){
+                        System.out.println(stringValue.toUpperCase());
+                    }
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+
     }
 }
