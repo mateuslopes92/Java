@@ -1,56 +1,54 @@
 package org.example;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class GraderTest {
 
-    @Test
-    void fifthNineShouldReturnF() {
-        var grader = new Grader();
-        var result = grader.determineLetterGrade(59);
+    private Grader grader;
 
-        assertEquals('F', result);
+    @BeforeEach
+    void setUp() {
+        grader = new Grader();
+    }
+
+    @ParameterizedTest
+    @DisplayName("Grades below 60 should return F")
+    @ValueSource(ints = {0, 10, 30, 59})
+    void shouldReturnF(int score){
+        assertEquals('F', grader.determineLetterGrade(score));
+    }
+
+    @ParameterizedTest
+    @DisplayName("Verify correct letter grade for boundary values")
+    @CsvSource({
+            "69, D",
+            "79, C",
+            "89, B",
+            "99, A"
+    })
+    void shouldReturnCorrectGrade(int score, char expectedGrade){
+        assertEquals(expectedGrade, grader.determineLetterGrade(score));
     }
 
     @Test
-    void sixtyNineShouldReturnD() {
-        var grader = new Grader();
-        var result = grader.determineLetterGrade(69);
-
-        assertEquals('D', result);
+    @DisplayName("Negative grades should throw exception")
+    void negativeGradeShouldThrowException(){
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> grader.determineLetterGrade(-1)
+        );
     }
 
     @Test
-    void senventyNineShouldReturnC() {
-        var grader = new Grader();
-        var result = grader.determineLetterGrade(79);
-
-        assertEquals('C', result);
+    @DisplayName("Grade 100 should still return A")
+    void hundredShouldReturnA(){
+        assertEquals('A', grader.determineLetterGrade(100));
     }
-
-    @Test
-    void eightyNineShouldReturnB() {
-        var grader = new Grader();
-        var result = grader.determineLetterGrade(89);
-
-        assertEquals('B', result);
-    }
-
-    @Test
-    void ninetyNineShouldReturnA() {
-        var grader = new Grader();
-        var result = grader.determineLetterGrade(99);
-
-        assertEquals('A', result);
-    }
-
-    @Test
-    void negativeOneShouldReturnIllegalArgumentException() {
-        var grader = new Grader();
-
-        assertThrows(IllegalArgumentException.class, () -> { grader.determineLetterGrade(-1); });
-    }
-
 }
