@@ -13,10 +13,10 @@ JUnit tests are usually placed in the **test folder** and validate the behavior 
 To use JUnit 5 in a Maven project, add the dependency in the `pom.xml`.
 
 ```xml
-<dependencies>
+    <dependencies>
     <dependency>
         <groupId>org.junit.jupiter</groupId>
-        <artifactId>junit-jupiter-engine</artifactId>
+        <artifactId>junit-jupiter</artifactId>
         <version>5.12.2</version>
         <scope>test</scope>
     </dependency>
@@ -30,11 +30,11 @@ To use JUnit 5 in a Maven project, add the dependency in the `pom.xml`.
 
 # Basic Structure of a Test
 
-A test normally follows the **Arrange → Act → Assert** pattern:
+A test normally follows the **Arrange → Act → Assert** pattern.
 
-1. **Arrange** – create objects and prepare data.
-2. **Act** – execute the method being tested.
-3. **Assert** – verify the expected result.
+1. **Arrange** – create objects and prepare data
+2. **Act** – execute the method being tested
+3. **Assert** – verify the expected result
 
 Example:
 
@@ -74,11 +74,83 @@ Important notes:
 
 ---
 
+# Test Lifecycle Annotations
+
+JUnit provides annotations to run setup and cleanup logic.
+
+## `@BeforeEach`
+
+Runs **before every test method**.
+
+```java
+@BeforeEach
+void setUp() {
+    calculator = new SimpleCalculator();
+}
+```
+
+This helps avoid repeating object creation in every test.
+
+---
+
+## `@AfterEach`
+
+Runs **after each test**.
+
+```java
+@AfterEach
+void tearDown() {
+    System.out.println("Test finished");
+}
+```
+
+---
+
+## `@BeforeAll`
+
+Runs **once before all tests**.
+
+```java
+@BeforeAll
+static void init(){
+    System.out.println("Starting tests");
+}
+```
+
+---
+
+## `@AfterAll`
+
+Runs **once after all tests**.
+
+```java
+@AfterAll
+static void cleanup(){
+    System.out.println("All tests finished");
+}
+```
+
+---
+
+# Display Names
+
+`@DisplayName` allows tests to have more readable descriptions.
+
+```java
+@DisplayName("2 + 2 should equal 4")
+@Test
+void addTest(){
+    assertEquals(4, calculator.add(2,2));
+}
+```
+
+---
+
 # Assertions
 
-Assertions are used to verify that the **expected result matches the actual result**.
+Assertions verify that the **expected result matches the actual result**.
 
-JUnit provides many assertion methods inside:
+JUnit provides many assertions inside:
 
 ```java
 org.junit.jupiter.api.Assertions
@@ -87,9 +159,12 @@ org.junit.jupiter.api.Assertions
 Common assertions include:
 
 - `assertEquals(expected, actual)`
-- `assertThrows(exception, executable)`
 - `assertTrue(condition)`
 - `assertFalse(condition)`
+- `assertNull(object)`
+- `assertNotNull(object)`
+- `assertThrows(exception, executable)`
+- `assertAll(...)`
 
 Example:
 
@@ -97,13 +172,48 @@ Example:
 assertEquals(4, result);
 ```
 
-This verifies that the value returned by the method equals `4`.
+---
+
+# Parameterized Tests
+
+Parameterized tests allow running the **same test with multiple inputs**.
+
+## `@ValueSource`
+
+```java
+@ParameterizedTest
+@ValueSource(ints = {0, 10, 30, 59})
+void shouldReturnF(int score){
+    assertEquals('F', grader.determineLetterGrade(score));
+}
+```
+
+---
+
+## `@CsvSource`
+
+Allows passing **multiple parameters**.
+
+```java
+@ParameterizedTest
+@CsvSource({
+    "69, D",
+    "79, C",
+    "89, B",
+    "99, A"
+})
+void shouldReturnCorrectGrade(int score, char expected){
+    assertEquals(expected, grader.determineLetterGrade(score));
+}
+```
+
+This is very useful when testing **multiple combinations of input/output**.
 
 ---
 
 # Testing a Simple Method
 
-### Class being tested
+## Class being tested
 
 ```java
 package org.example;
@@ -117,46 +227,67 @@ public class SimpleCalculator {
 }
 ```
 
-### Test Class
+---
+
+# SimpleCalculator Tests
 
 ```java
 package org.example;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class SimpleCalculatorTest {
 
-    @Test
-    void twoPlusTwoShouldEqualFour(){
-        SimpleCalculator calculator = new SimpleCalculator();
-        int result = calculator.add(2, 2);
+    private SimpleCalculator calculator;
 
+    @BeforeEach
+    void setUp() {
+        calculator = new SimpleCalculator();
+    }
+
+    @Test
+    @DisplayName("2 + 2 should equal 4")
+    void twoPlusTwoShouldEqualFour(){
+        int result = calculator.add(2,2);
         assertEquals(4, result);
     }
 
     @Test
+    @DisplayName("3 + 7 should equal 10")
     void threePlusSevenShouldEqualTen(){
-        SimpleCalculator calculator = new SimpleCalculator();
-        int result = calculator.add(3, 7);
-
+        int result = calculator.add(3,7);
         assertEquals(10, result);
+    }
+
+    @Test
+    @DisplayName("Addition results should always be positive")
+    void resultShouldBePositive(){
+        int result = calculator.add(5,5);
+        assertTrue(result > 0);
+    }
+
+    @Test
+    @DisplayName("Multiple assertions example")
+    void multipleAssertions(){
+        int result = calculator.add(4,6);
+
+        assertAll(
+                () -> assertEquals(10, result),
+                () -> assertTrue(result > 0)
+        );
     }
 }
 ```
-
-What these tests verify:
-
-- `2 + 2` returns `4`
-- `3 + 7` returns `10`
 
 ---
 
 # Testing Conditional Logic
 
-Now testing a class with **multiple conditions**.
-
-### Class being tested
+## Class being tested
 
 ```java
 package org.example;
@@ -186,107 +317,73 @@ public class Grader {
 This method converts a **numeric grade into a letter grade**.
 
 | Score | Grade |
-| ----- | ----- |
-| < 60  | F     |
-| 60–69 | D     |
-| 70–79 | C     |
-| 80–89 | B     |
-| ≥ 90  | A     |
+|------|------|
+| < 60 | F |
+| 60–69 | D |
+| 70–79 | C |
+| 80–89 | B |
+| ≥ 90 | A |
 
 ---
 
-# Testing Different Scenarios
-
-To properly test the method we should cover **multiple cases**.
-
-### Test Class
+# Grader Tests
 
 ```java
 package org.example;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.params.provider.CsvSource;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class GraderTest {
 
-    @Test
-    void fifthNineShouldReturnF() {
-        var grader = new Grader();
-        var result = grader.determineLetterGrade(59);
+    private Grader grader;
 
-        assertEquals('F', result);
+    @BeforeEach
+    void setUp() {
+        grader = new Grader();
+    }
+
+    @ParameterizedTest
+    @DisplayName("Grades below 60 should return F")
+    @ValueSource(ints = {0, 10, 30, 59})
+    void shouldReturnF(int score){
+        assertEquals('F', grader.determineLetterGrade(score));
+    }
+
+    @ParameterizedTest
+    @DisplayName("Verify correct letter grades")
+    @CsvSource({
+            "69, D",
+            "79, C",
+            "89, B",
+            "99, A"
+    })
+    void shouldReturnCorrectGrade(int score, char expectedGrade){
+        assertEquals(expectedGrade, grader.determineLetterGrade(score));
     }
 
     @Test
-    void sixtyNineShouldReturnD() {
-        var grader = new Grader();
-        var result = grader.determineLetterGrade(69);
-
-        assertEquals('D', result);
+    @DisplayName("Negative grades should throw exception")
+    void negativeGradeShouldThrowException(){
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> grader.determineLetterGrade(-1)
+        );
     }
 
     @Test
-    void senventyNineShouldReturnC() {
-        var grader = new Grader();
-        var result = grader.determineLetterGrade(79);
-
-        assertEquals('C', result);
-    }
-
-    @Test
-    void eightyNineShouldReturnB() {
-        var grader = new Grader();
-        var result = grader.determineLetterGrade(89);
-
-        assertEquals('B', result);
-    }
-
-    @Test
-    void ninetyNineShouldReturnA() {
-        var grader = new Grader();
-        var result = grader.determineLetterGrade(99);
-
-        assertEquals('A', result);
+    @DisplayName("Grade 100 should still return A")
+    void hundredShouldReturnA(){
+        assertEquals('A', grader.determineLetterGrade(100));
     }
 }
 ```
-
-Each test verifies a **specific boundary of the grading logic**.
-
----
-
-# Testing Exceptions
-
-JUnit also allows testing if a method throws an exception.
-
-In this case, the method should throw an exception if the grade is **less than 0**.
-
-### Method behavior
-
-```java
-if(numberGrade < 0){
-    throw new IllegalArgumentException("Number grade cannot be less than 0");
-}
-```
-
-### Test
-
-```java
-@Test
-void negativeOneShouldReturnIllegalArgumentException() {
-    var grader = new Grader();
-
-    assertThrows(
-        IllegalArgumentException.class,
-        () -> { grader.determineLetterGrade(-1); }
-    );
-}
-```
-
-Explanation:
-
-- `assertThrows` verifies that the method throws the expected exception.
-- The code being tested is passed as a **lambda expression**.
 
 ---
 
@@ -323,11 +420,15 @@ JUnit 5 allows you to:
 - Detect bugs early
 - Improve code reliability
 
-Key concepts used in this project:
+Key features used in this project:
 
 - `@Test`
+- `@BeforeEach`
+- `@DisplayName`
+- `@ParameterizedTest`
+- `@ValueSource`
+- `@CsvSource`
 - `assertEquals`
+- `assertTrue`
 - `assertThrows`
-- Unit testing small methods
-- Testing conditional logic
-- Testing exceptions
+- `assertAll`
