@@ -6,6 +6,7 @@ import java.time.format.DateTimeFormatter;
 public class JavaTimeExample {
 
     public static void main(String[] args) {
+        System.out.println("-------JavaTimeExample-------");
 
         // Current date and time
         LocalDateTime now = LocalDateTime.now();
@@ -30,5 +31,8 @@ public class JavaTimeExample {
         // Difference between dates
         Duration duration = Duration.between(now, future);
         System.out.println("Hours difference: " + duration.toHours());
+
+        System.out.println("-----------------------------");
+        System.out.println("\n");
     }
 }

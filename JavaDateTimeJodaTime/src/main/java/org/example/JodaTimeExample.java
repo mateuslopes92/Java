@@ -7,6 +7,7 @@ import org.joda.time.format.DateTimeFormatter;
 public class JodaTimeExample {
 
     public static void main(String[] args) {
+        System.out.println("-------JodaTimeExample-------");
 
         // Current date and time
         DateTime now = DateTime.now();
@@ -31,5 +32,8 @@ public class JodaTimeExample {
         // Difference
         Duration duration = new Duration(now, future);
         System.out.println("Hours difference: " + duration.getStandardHours());
+
+        System.out.println("-----------------------------");
+        System.out.println("\n");
     }
 }
