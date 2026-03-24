@@ -4,7 +4,7 @@ package org.example.creational;
 // with using  getInstance() method
 
 // Helper class
-public class Singleton {
+class Singleton {
 
     // Static variable reference of single_instance
     // of type Singleton
@@ -32,9 +32,11 @@ public class Singleton {
 }
 
 // Main
-class SingletonExample {
+public class SingletonExample {
 
     public static void main(String args[]){
+        System.out.println("-------Singleton-------");
+
         // Instantiating Singleton class with variable x
         Singleton x = Singleton.getInstance();
 
@@ -61,6 +63,8 @@ class SingletonExample {
             System.out.println(
                     "Three objects DO NOT point to the same memory location on the heap");
         }
+
+        System.out.println("-----------------------\n");
     }
 
 }
