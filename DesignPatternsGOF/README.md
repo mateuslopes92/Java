@@ -1,4 +1,22 @@
 # GOF Design Patterns
+GoF stands for Gang of Four.
+
+It refers to the four authors of the classic design patterns book:
+
+- Erich Gamma
+- Richard Helm
+- Ralph Johnson
+- John Vlissides
+
+GoF = the 4 guys who defined the design patterns
+
+They wrote the famous book:
+- Design Patterns: Elements of Reusable Object-Oriented Software
+
+### Why it matters
+- This book introduced the 23 classic design patterns
+- It became the foundation of modern software design
+- When people say “GoF patterns”, they mean those 23 patterns
 
 ## Creational Patterns
 
@@ -7,7 +25,7 @@ This pattern is a creational pattern.
 - Ensures that only one instalce of its kind exists.
 - Provides a single point of access to it.
 - Let you access your object from anywhere in your application
-- Guarantee that only one instace of this class will be availabe at any point of time 
+- Guarantee that only one instace of this class will be availabe at any point of time
 
 Eg: A database instance.
 
