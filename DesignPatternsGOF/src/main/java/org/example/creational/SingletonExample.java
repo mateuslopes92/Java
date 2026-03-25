@@ -8,10 +8,10 @@ class Singleton {
 
     // Static variable reference of single_instance
     // of type Singleton
-    private static Singleton single_instance = null;
+    private static volatile Singleton single_instance = null;
 
     // Declaring a variable of type String
-    public String s;
+    private String s;
 
     // Constructor
     // Here we will be creating private constructor
@@ -22,9 +22,14 @@ class Singleton {
 
     // Static method
     // Static method to create instance of Singleton class
-    public static synchronized Singleton getInstance() {
+    // The syncrhronized ensures each thread wait for its time, it locks it
+    public static Singleton getInstance() {
         if(single_instance == null){
-            single_instance = new Singleton();
+            synchronized (Singleton.class){
+                if(single_instance == null){
+                    single_instance = new Singleton();
+                }
+            }
         }
 
         return single_instance;
