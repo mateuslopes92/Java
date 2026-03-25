@@ -51,3 +51,68 @@ class Singleton {
 - Should be used when a class must have a single instance available
 - Returns the existing instance if it has already been created
 - Needs to handle multiple threads to be more robust
+
+
+## Factory Method
+This pattern is a creational pattern.
+- Provides an interface for creating objects.
+- Lets a class decide which object to create.
+- Encapsulates object creation logic.
+- Promotes loose coupling by avoiding direct instantiation (`new`).
+
+Eg: Creating different types of objects like shapes, payments, notifications.
+
+```java
+interface Shape {
+    void draw();
+}
+
+class Circle implements Shape {
+    public void draw() {
+        System.out.println("Drawing a Circle");
+    }
+}
+
+class Square implements Shape {
+    public void draw() {
+        System.out.println("Drawing a Square");
+    }
+}
+
+class Triangle implements Shape {
+    public void draw() {
+        System.out.println("Drawing a Triangle");
+    }
+}
+
+class ShapeFactory {
+
+    public static Shape getShape(String shapeType) {
+
+        if (shapeType == null) {
+            return null;
+        }
+
+        switch (shapeType.toLowerCase()) {
+            case "circle":
+                return new Circle();
+            case "square":
+                return new Square();
+            case "triangle":
+                return new Triangle();
+            default:
+                throw new IllegalArgumentException("Unknown shape type: " + shapeType);
+        }
+    }
+}
+```
+
+- The factory centralizes object creation in one place.
+- Clients don’t need to know the concrete classes being instantiated.
+- The logic for choosing which object to create is encapsulated.
+
+#### Conclusion
+- Should be used when the creation logic is complex or may change
+- Helps reduce tight coupling between classes
+- Makes code easier to extend (add new types without changing client code)
+- Returns objects based on input instead of direct instantiation
