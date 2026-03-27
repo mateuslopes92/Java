@@ -134,3 +134,100 @@ class ShapeFactory {
 - Helps reduce tight coupling between classes
 - Makes code easier to extend (add new types without changing client code)
 - Returns objects based on input instead of direct instantiation
+
+## Abstract Factory
+This pattern is a creational pattern.
+- Provides an interface for creating families of related objects.
+- Ensures that related objects are used together.
+- Encapsulates a group of individual factories.
+- Promotes consistency between products.
+
+Eg: Creating UI components based on a theme (light or dark), where all components follow the same style.
+
+```java
+// Abstract Products
+interface Button {
+    void render();
+}
+
+interface Checkbox {
+    void render();
+}
+
+// Concrete Products (Light Theme)
+class LightButton implements Button {
+    public void render() {
+        System.out.println("Rendering Light Button");
+    }
+}
+
+class LightCheckbox implements Checkbox {
+    public void render() {
+        System.out.println("Rendering Light Checkbox");
+    }
+}
+
+// Concrete Products (Dark Theme)
+class DarkButton implements Button {
+    public void render() {
+        System.out.println("Rendering Dark Button");
+    }
+}
+
+class DarkCheckbox implements Checkbox {
+    public void render() {
+        System.out.println("Rendering Dark Checkbox");
+    }
+}
+
+// Abstract Factory
+interface UIFactory {
+    Button createButton();
+    Checkbox createCheckbox();
+}
+
+// Concrete Factories
+class LightThemeFactory implements UIFactory {
+    public Button createButton() {
+        return new LightButton();
+    }
+
+    public Checkbox createCheckbox() {
+        return new LightCheckbox();
+    }
+}
+
+class DarkThemeFactory implements UIFactory {
+    public Button createButton() {
+        return new DarkButton();
+    }
+
+    public Checkbox createCheckbox() {
+        return new DarkCheckbox();
+    }
+}
+
+// Factory Producer
+class FactoryProducer {
+    public static UIFactory getFactory(String theme) {
+
+        if (theme.equalsIgnoreCase("light")) {
+            return new LightThemeFactory();
+        } else if (theme.equalsIgnoreCase("dark")) {
+            return new DarkThemeFactory();
+        }
+
+        throw new IllegalArgumentException("Unknown theme");
+    }
+}
+```
+
+- The abstract factory groups multiple factories together.
+- Clients use a factory without knowing the concrete implementations.
+- Ensures that objects created belong to the same family.
+
+#### Conclusion
+- Should be used when your system needs to work with multiple families of related objects
+- Helps enforce consistency between related objects
+- Makes switching between product families easy (e.g., light → dark theme)
+- Adds an extra abstraction layer compared to Factory Method
