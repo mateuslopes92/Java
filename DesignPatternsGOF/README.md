@@ -231,3 +231,80 @@ class FactoryProducer {
 - Helps enforce consistency between related objects
 - Makes switching between product families easy (e.g., light → dark theme)
 - Adds an extra abstraction layer compared to Factory Method
+
+## Builder
+This pattern is a creational pattern.
+- Builds complex objects step by step.
+- Separates object construction from its representation.
+- Allows creation of different representations of the same object.
+- Improves readability using method chaining (fluent API).
+
+Eg: Creating objects with many optional parameters like users, requests, or configurations.
+
+```java
+class User {
+
+    // Required fields
+    private final String name;
+
+    // Optional fields
+    private final int age;
+    private final String email;
+    private final String phone;
+
+    // Private constructor (only Builder can create)
+    private User(Builder builder) {
+        this.name = builder.name;
+        this.age = builder.age;
+        this.email = builder.email;
+        this.phone = builder.phone;
+    }
+
+    // Static Builder class
+    public static class Builder {
+
+        // Required
+        private final String name;
+
+        // Optional (default values)
+        private int age = 0;
+        private String email = "";
+        private String phone = "";
+
+        // Constructor with required fields
+        public Builder(String name) {
+            this.name = name;
+        }
+
+        // Setters for optional fields (method chaining)
+        public Builder age(int age) {
+            this.age = age;
+            return this;
+        }
+
+        public Builder email(String email) {
+            this.email = email;
+            return this;
+        }
+
+        public Builder phone(String phone) {
+            this.phone = phone;
+            return this;
+        }
+
+        // Build method
+        public User build() {
+            return new User(this);
+        }
+    }
+}
+```
+- The object is created step by step using the Builder.
+- The constructor is private to enforce usage of the Builder.
+- Method chaining makes the code more readable and flexible.
+
+#### Conclusion
+- Should be used when an object has many optional parameters
+- Avoids large constructors with many arguments
+- Improves code readability and maintainability
+- Allows creation of immutable objects
