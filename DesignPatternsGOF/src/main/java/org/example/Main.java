@@ -1,6 +1,7 @@
 package org.example;
 
 import org.example.creational.AbstractFactoryExample;
+import org.example.creational.BuilderExample;
 import org.example.creational.SingletonExample;
 import org.example.creational.FactoryExample;
 
@@ -11,5 +12,6 @@ public class Main {
         SingletonExample.main(args);
         FactoryExample.main(args);
         AbstractFactoryExample.main(args);
+        BuilderExample.main(args);
     }
 }
