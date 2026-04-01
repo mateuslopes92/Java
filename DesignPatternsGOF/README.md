@@ -308,3 +308,80 @@ class User {
 - Avoids large constructors with many arguments
 - Improves code readability and maintainability
 - Allows creation of immutable objects
+## Prototype
+This pattern is a creational pattern.
+- Creates new objects by cloning existing ones.
+- Avoids the cost of creating objects from scratch.
+- Allows copying objects without depending on their concrete classes.
+- Uses a prototype instance to generate new objects.
+
+Eg: Cloning document templates like reports or invoices instead of creating them every time.
+
+```java
+abstract class Document implements Cloneable {
+
+    protected String title;
+    protected String content;
+
+    abstract void show();
+
+    public Document clone() {
+        try {
+            return (Document) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException("Cloning not supported");
+        }
+    }
+}
+
+class Report extends Document {
+
+    public Report() {
+        this.title = "Report Template";
+        this.content = "Report Content...";
+    }
+
+    void show() {
+        System.out.println("Report Title: " + title);
+        System.out.println("Report Content: " + content);
+    }
+}
+
+class Invoice extends Document {
+
+    public Invoice() {
+        this.title = "Invoice Template";
+        this.content = "Invoice Content...";
+    }
+
+    void show() {
+        System.out.println("Invoice Title: " + title);
+        System.out.println("Invoice Content: " + content);
+    }
+}
+
+class DocumentCache {
+
+    private static final java.util.Map<String, Document> cache = new java.util.HashMap<>();
+
+    public static void loadCache() {
+        cache.put("report", new Report());
+        cache.put("invoice", new Invoice());
+    }
+
+    public static Document getDocument(String type) {
+        Document doc = cache.get(type);
+        return doc.clone();
+    }
+}
+```
+
+- Objects are cloned instead of instantiated with new.
+- A cache (registry) stores prototype instances.
+- The client gets a copy without knowing the concrete class.
+
+#### Conclusion
+- Should be used when object creation is expensive
+- Improves performance by reusing existing instances
+- Reduces the need for subclassing for object creation
+- Useful when many similar objects are needed
