@@ -385,3 +385,51 @@ class DocumentCache {
 - Improves performance by reusing existing instances
 - Reduces the need for subclassing for object creation
 - Useful when many similar objects are needed
+
+---
+
+## Structural Patterns
+
+## Adapter
+This pattern is a structural pattern.
+- Allows incompatible interfaces to work together.
+- Acts as a bridge between two different interfaces.
+- Converts one interface into another expected by the client.
+- Helps reuse existing classes without modifying them.
+
+Eg: Adapting a legacy payment system to a new payment interface.
+
+```java
+interface PaymentProcessor {
+    void pay(int amount);
+}
+
+class LegacyPaymentSystem {
+    public void makePayment(int valueInCents) {
+        System.out.println("Processing payment of " + valueInCents + " cents using legacy system");
+    }
+}
+
+class PaymentAdapter implements PaymentProcessor {
+
+    private final LegacyPaymentSystem legacySystem;
+
+    public PaymentAdapter(LegacyPaymentSystem legacySystem) {
+        this.legacySystem = legacySystem;
+    }
+
+    public void pay(int amount) {
+        int valueInCents = amount * 100;
+        legacySystem.makePayment(valueInCents);
+    }
+}
+```
+- The adapter wraps the existing (legacy) class.
+- It converts the expected interface into the compatible one.
+- The client interacts only with the target interface.
+
+#### Conclusion
+- Should be used when two incompatible interfaces need to work together
+- Helps reuse existing or legacy code without modification
+- Improves flexibility by introducing a conversion layer
+- Common in integrations and external APIs
