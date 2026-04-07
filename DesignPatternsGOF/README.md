@@ -502,3 +502,62 @@ class SMSDecorator extends NotificationDecorator {
 - Avoids creating many subclasses for every combination of features
 - Keeps code flexible and extensible
 - Common in middleware, logging, and UI composition
+
+## Facade
+This pattern is a structural pattern.
+- Provides a simplified interface to a complex system.
+- Hides the complexity of multiple subsystems.
+- Reduces dependencies between client and subsystems.
+- Improves readability and usability of the system.
+
+Eg: Placing an order using a single method that internally handles payment, inventory, and shipping.
+
+```java
+class PaymentService {
+    public void processPayment() {
+        System.out.println("Processing payment...");
+    }
+}
+
+class InventoryService {
+    public void checkStock() {
+        System.out.println("Checking inventory...");
+    }
+}
+
+class ShippingService {
+    public void shipOrder() {
+        System.out.println("Shipping order...");
+    }
+}
+
+class OrderFacade {
+
+    private final PaymentService paymentService;
+    private final InventoryService inventoryService;
+    private final ShippingService shippingService;
+
+    public OrderFacade() {
+        this.paymentService = new PaymentService();
+        this.inventoryService = new InventoryService();
+        this.shippingService = new ShippingService();
+    }
+
+    public void placeOrder() {
+        paymentService.processPayment();
+        inventoryService.checkStock();
+        shippingService.shipOrder();
+        System.out.println("Order placed successfully!");
+    }
+}
+```
+
+- The facade provides a single entry point to multiple subsystems.
+- Clients interact only with the facade, not with individual services.
+- The internal complexity is hidden from the client.
+
+#### Conclusion
+- Should be used when working with complex systems
+- Simplifies client interaction with multiple components
+- Reduces coupling between client and subsystems
+- Improves code organization and readability
