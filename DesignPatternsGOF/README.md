@@ -308,6 +308,7 @@ class User {
 - Avoids large constructors with many arguments
 - Improves code readability and maintainability
 - Allows creation of immutable objects
+
 ## Prototype
 This pattern is a creational pattern.
 - Creates new objects by cloning existing ones.
@@ -433,3 +434,71 @@ class PaymentAdapter implements PaymentProcessor {
 - Helps reuse existing or legacy code without modification
 - Improves flexibility by introducing a conversion layer
 - Common in integrations and external APIs
+
+## Decorator
+This pattern is a structural pattern.
+- Adds new behavior to objects dynamically.
+- Wraps objects instead of modifying their code.
+- Follows the Open/Closed Principle (open for extension, closed for modification).
+- Allows combining multiple behaviors at runtime.
+
+Eg: Adding multiple notification channels like email and SMS on top of a basic notification.
+
+```java
+interface Notification {
+    void send(String message);
+}
+
+class BasicNotification implements Notification {
+    public void send(String message) {
+        System.out.println("Sending basic notification: " + message);
+    }
+}
+
+abstract class NotificationDecorator implements Notification {
+
+    protected final Notification wrapped;
+
+    public NotificationDecorator(Notification wrapped) {
+        this.wrapped = wrapped;
+    }
+
+    public void send(String message) {
+        wrapped.send(message);
+    }
+}
+
+class EmailDecorator extends NotificationDecorator {
+
+    public EmailDecorator(Notification wrapped) {
+        super(wrapped);
+    }
+
+    public void send(String message) {
+        super.send(message);
+        System.out.println("Sending EMAIL notification: " + message);
+    }
+}
+
+class SMSDecorator extends NotificationDecorator {
+
+    public SMSDecorator(Notification wrapped) {
+        super(wrapped);
+    }
+
+    public void send(String message) {
+        super.send(message);
+        System.out.println("Sending SMS notification: " + message);
+    }
+}
+```
+
+- The decorator wraps the original object.
+- Each decorator adds new behavior before or after delegating.
+- Multiple decorators can be combined dynamically.
+
+#### Conclusion
+- Should be used when you need to add responsibilities dynamically
+- Avoids creating many subclasses for every combination of features
+- Keeps code flexible and extensible
+- Common in middleware, logging, and UI composition
