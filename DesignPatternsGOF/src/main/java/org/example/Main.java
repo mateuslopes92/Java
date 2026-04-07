@@ -3,6 +3,7 @@ package org.example;
 import org.example.creational.*;
 import org.example.structural.AdapterExample;
 import org.example.structural.DecoratorExample;
+import org.example.structural.FacadeExample;
 
 public class Main {
     public static void main(String[] args) {
@@ -18,5 +19,6 @@ public class Main {
         // Structural
         AdapterExample.main(args);
         DecoratorExample.main(args);
+        FacadeExample.main(args);
     }
 }
