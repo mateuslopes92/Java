@@ -71,7 +71,7 @@ class Singleton {
 - Needs to handle multiple threads to be more robust
 
 
-## Factory Method
+### Factory Method
 This pattern is a creational pattern.
 - Provides an interface for creating objects.
 - Lets a class decide which object to create.
@@ -135,7 +135,7 @@ class ShapeFactory {
 - Makes code easier to extend (add new types without changing client code)
 - Returns objects based on input instead of direct instantiation
 
-## Abstract Factory
+### Abstract Factory
 This pattern is a creational pattern.
 - Provides an interface for creating families of related objects.
 - Ensures that related objects are used together.
@@ -232,7 +232,7 @@ class FactoryProducer {
 - Makes switching between product families easy (e.g., light → dark theme)
 - Adds an extra abstraction layer compared to Factory Method
 
-## Builder
+### Builder
 This pattern is a creational pattern.
 - Builds complex objects step by step.
 - Separates object construction from its representation.
@@ -309,7 +309,7 @@ class User {
 - Improves code readability and maintainability
 - Allows creation of immutable objects
 
-## Prototype
+### Prototype
 This pattern is a creational pattern.
 - Creates new objects by cloning existing ones.
 - Avoids the cost of creating objects from scratch.
@@ -391,7 +391,7 @@ class DocumentCache {
 
 ## Structural Patterns
 
-## Adapter
+### Adapter
 This pattern is a structural pattern.
 - Allows incompatible interfaces to work together.
 - Acts as a bridge between two different interfaces.
@@ -435,7 +435,7 @@ class PaymentAdapter implements PaymentProcessor {
 - Improves flexibility by introducing a conversion layer
 - Common in integrations and external APIs
 
-## Decorator
+### Decorator
 This pattern is a structural pattern.
 - Adds new behavior to objects dynamically.
 - Wraps objects instead of modifying their code.
@@ -503,7 +503,7 @@ class SMSDecorator extends NotificationDecorator {
 - Keeps code flexible and extensible
 - Common in middleware, logging, and UI composition
 
-## Facade
+### Facade
 This pattern is a structural pattern.
 - Provides a simplified interface to a complex system.
 - Hides the complexity of multiple subsystems.
@@ -563,7 +563,7 @@ class OrderFacade {
 - Improves code organization and readability
 
 
-## Proxy
+### Proxy
 This pattern is a structural pattern.
 - Provides a placeholder or surrogate for another object.
 - Controls access to the original object.
@@ -613,3 +613,66 @@ class FileServiceProxy implements FileService {
 - Useful for security, caching, logging, and lazy initialization
 - Keeps the client unaware of the control logic
 - Adds flexibility without modifying the original class
+
+---
+
+## Behavioral Patterns
+
+### Strategy
+This pattern is a behavioral pattern.
+- Defines a family of algorithms and makes them interchangeable.
+- Allows behavior to be selected at runtime.
+- Encapsulates each algorithm in a separate class.
+- Eliminates the need for multiple conditional statements.
+
+Eg: Choosing different payment methods like credit card, PayPal, or Pix dynamically.
+
+```java
+interface PaymentStrategy {
+    void pay(int amount);
+}
+
+class CreditCardPayment implements PaymentStrategy {
+    public void pay(int amount) {
+        System.out.println("Paid " + amount + " using Credit Card");
+    }
+}
+
+class PayPalPayment implements PaymentStrategy {
+    public void pay(int amount) {
+        System.out.println("Paid " + amount + " using PayPal");
+    }
+}
+
+class PixPayment implements PaymentStrategy {
+    public void pay(int amount) {
+        System.out.println("Paid " + amount + " using Pix");
+    }
+}
+
+class PaymentContext {
+
+    private PaymentStrategy strategy;
+
+    public void setStrategy(PaymentStrategy strategy) {
+        this.strategy = strategy;
+    }
+
+    public void processPayment(int amount) {
+        if (strategy == null) {
+            throw new IllegalStateException("Payment strategy not set");
+        }
+        strategy.pay(amount);
+    }
+}
+```
+
+- Each strategy encapsulates a specific algorithm.
+- The context delegates execution to the selected strategy.
+- Strategies can be changed dynamically at runtime.
+
+#### Conclusion
+- Should be used when multiple algorithms can be applied interchangeably
+- Reduces complex conditional logic
+- Makes code easier to extend and maintain
+- Promotes composition over inheritance
