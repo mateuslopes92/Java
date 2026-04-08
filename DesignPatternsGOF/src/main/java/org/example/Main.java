@@ -1,5 +1,6 @@
 package org.example;
 
+import org.example.behavioral.StrategyExample;
 import org.example.creational.*;
 import org.example.structural.AdapterExample;
 import org.example.structural.DecoratorExample;
@@ -22,5 +23,8 @@ public class Main {
         DecoratorExample.main(args);
         FacadeExample.main(args);
         ProxyExample.main(args);
+
+        // Behavioral
+        StrategyExample.main(args);
     }
 }
