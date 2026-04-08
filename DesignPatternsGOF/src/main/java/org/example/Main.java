@@ -4,6 +4,7 @@ import org.example.creational.*;
 import org.example.structural.AdapterExample;
 import org.example.structural.DecoratorExample;
 import org.example.structural.FacadeExample;
+import org.example.structural.ProxyExample;
 
 public class Main {
     public static void main(String[] args) {
@@ -20,5 +21,6 @@ public class Main {
         AdapterExample.main(args);
         DecoratorExample.main(args);
         FacadeExample.main(args);
+        ProxyExample.main(args);
     }
 }
