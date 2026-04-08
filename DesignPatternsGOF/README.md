@@ -561,3 +561,55 @@ class OrderFacade {
 - Simplifies client interaction with multiple components
 - Reduces coupling between client and subsystems
 - Improves code organization and readability
+
+
+## Proxy
+This pattern is a structural pattern.
+- Provides a placeholder or surrogate for another object.
+- Controls access to the original object.
+- Adds additional behavior like security, caching, or logging.
+- Uses the same interface as the real object.
+
+Eg: Restricting access to a file service based on user role.
+
+```java
+interface FileService {
+    void readFile(String filename);
+}
+
+class RealFileService implements FileService {
+    public void readFile(String filename) {
+        System.out.println("Reading file: " + filename);
+    }
+}
+
+class FileServiceProxy implements FileService {
+
+    private final RealFileService realService;
+    private final String userRole;
+
+    public FileServiceProxy(String userRole) {
+        this.realService = new RealFileService();
+        this.userRole = userRole;
+    }
+
+    public void readFile(String filename) {
+
+        if ("ADMIN".equalsIgnoreCase(userRole)) {
+            realService.readFile(filename);
+        } else {
+            System.out.println("Access denied. Only ADMIN can read files.");
+        }
+    }
+}
+```
+
+- The proxy controls access to the real object.
+- It implements the same interface as the real object.
+- Additional logic is executed before delegating to the real object.
+
+#### Conclusion
+- Should be used when you need to control access to an object
+- Useful for security, caching, logging, and lazy initialization
+- Keeps the client unaware of the control logic
+- Adds flexibility without modifying the original class
