@@ -1,5 +1,6 @@
 package org.example;
 
+import org.example.behavioral.ObserverExample;
 import org.example.behavioral.StrategyExample;
 import org.example.creational.*;
 import org.example.structural.AdapterExample;
@@ -26,5 +27,6 @@ public class Main {
 
         // Behavioral
         StrategyExample.main(args);
+        ObserverExample.main(args);
     }
 }
