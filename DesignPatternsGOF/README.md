@@ -676,3 +676,76 @@ class PaymentContext {
 - Reduces complex conditional logic
 - Makes code easier to extend and maintain
 - Promotes composition over inheritance
+
+### Observer
+This pattern is a behavioral pattern.
+- Defines a one-to-many dependency between objects.
+- When one object changes state, all its dependents are notified automatically.
+- Promotes loose coupling between subject and observers.
+- Supports event-driven programming.
+
+Eg: Notifying customers and sellers when an order status changes.
+
+```java
+import java.util.ArrayList;
+import java.util.List;
+
+interface Observer {
+    void update(String status);
+}
+
+class Customer implements Observer {
+
+    private final String name;
+
+    public Customer(String name) {
+        this.name = name;
+    }
+
+    public void update(String status) {
+        System.out.println(name + " received update: " + status);
+    }
+}
+
+class Seller implements Observer {
+
+    public void update(String status) {
+        System.out.println("Seller notified: " + status);
+    }
+}
+
+class Order {
+
+    private final List<Observer> observers = new ArrayList<>();
+    private String status;
+
+    public void addObserver(Observer observer) {
+        observers.add(observer);
+    }
+
+    public void removeObserver(Observer observer) {
+        observers.remove(observer);
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+        notifyObservers();
+    }
+
+    private void notifyObservers() {
+        for (Observer observer : observers) {
+            observer.update(status);
+        }
+    }
+}
+```
+
+- The subject maintains a list of observers.
+- Observers subscribe to receive updates.
+- When the state changes, all observers are notified.
+
+#### Conclusion
+- Should be used when multiple objects depend on a single object’s state
+- Enables event-driven architectures
+- Reduces tight coupling between components
+- Common in UI frameworks, messaging systems, and real-time updates
