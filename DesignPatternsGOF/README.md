@@ -749,3 +749,81 @@ class Order {
 - Enables event-driven architectures
 - Reduces tight coupling between components
 - Common in UI frameworks, messaging systems, and real-time updates
+
+### Command
+This pattern is a behavioral pattern.
+- Encapsulates a request as an object.
+- Allows parameterization of clients with different requests.
+- Decouples the sender from the receiver.
+- Supports undo/redo and queueing of requests.
+
+Eg: A remote control triggering different actions like turning a light on or off.
+
+```java
+interface Command {
+    void execute();
+}
+
+class Light {
+
+    public void turnOn() {
+        System.out.println("Light is ON");
+    }
+
+    public void turnOff() {
+        System.out.println("Light is OFF");
+    }
+}
+
+class TurnOnCommand implements Command {
+
+    private final Light light;
+
+    public TurnOnCommand(Light light) {
+        this.light = light;
+    }
+
+    public void execute() {
+        light.turnOn();
+    }
+}
+
+class TurnOffCommand implements Command {
+
+    private final Light light;
+
+    public TurnOffCommand(Light light) {
+        this.light = light;
+    }
+
+    public void execute() {
+        light.turnOff();
+    }
+}
+
+class RemoteControl {
+
+    private Command command;
+
+    public void setCommand(Command command) {
+        this.command = command;
+    }
+
+    public void pressButton() {
+        if (command == null) {
+            throw new IllegalStateException("No command set");
+        }
+        command.execute();
+    }
+}
+```
+
+- The command encapsulates the action and its receiver.
+- The invoker triggers the command without knowing the implementation.
+- The receiver performs the actual work.
+
+#### Conclusion
+- Should be used when you want to decouple sender and receiver
+- Useful for implementing undo/redo functionality
+- Supports queuing and logging of requests
+- Improves flexibility and extensibility of code
