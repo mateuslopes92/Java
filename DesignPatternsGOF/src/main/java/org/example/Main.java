@@ -1,5 +1,6 @@
 package org.example;
 
+import org.example.behavioral.ChainOfResponsibilityExample;
 import org.example.behavioral.CommandExample;
 import org.example.behavioral.ObserverExample;
 import org.example.behavioral.StrategyExample;
@@ -30,5 +31,6 @@ public class Main {
         StrategyExample.main(args);
         ObserverExample.main(args);
         CommandExample.main(args);
+        ChainOfResponsibilityExample.main(args);
     }
 }
