@@ -827,3 +827,80 @@ class RemoteControl {
 - Useful for implementing undo/redo functionality
 - Supports queuing and logging of requests
 - Improves flexibility and extensibility of code
+
+### Chain of Responsibility
+This pattern is a behavioral pattern.
+- Passes a request along a chain of handlers.
+- Each handler decides whether to process the request or pass it to the next.
+- Decouples sender and receiver of a request.
+- Allows multiple objects to handle a request without the client knowing which one will handle it.
+
+Eg: Processing a request through authentication, logging, and validation steps.
+
+```java
+abstract class Handler {
+
+    protected Handler next;
+
+    public Handler setNext(Handler next) {
+        this.next = next;
+        return next;
+    }
+
+    public abstract void handle(String request);
+}
+
+class AuthHandler extends Handler {
+
+    public void handle(String request) {
+
+        if (!request.contains("auth=true")) {
+            System.out.println("Authentication failed");
+            return;
+        }
+
+        System.out.println("Authentication passed");
+
+        if (next != null) {
+            next.handle(request);
+        }
+    }
+}
+
+class LoggingHandler extends Handler {
+
+    public void handle(String request) {
+        System.out.println("Logging request: " + request);
+
+        if (next != null) {
+            next.handle(request);
+        }
+    }
+}
+
+class ValidationHandler extends Handler {
+
+    public void handle(String request) {
+
+        if (!request.contains("data=")) {
+            System.out.println("Validation failed: no data");
+            return;
+        }
+
+        System.out.println("Validation passed");
+
+        if (next != null) {
+            next.handle(request);
+        }
+    }
+}
+```
+- Each handler processes the request or passes it forward.
+- The chain is built dynamically by linking handlers.
+- The request flows through the chain until it is handled or stopped.
+
+#### Conclusion
+- Should be used when multiple objects can handle a request
+- Decouples sender from receiver
+- Allows flexible and dynamic request processing pipelines
+- Common in middleware, filters, and validation chains
