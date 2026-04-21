@@ -118,3 +118,63 @@ Thread.startVirtualThread(...)
   
 ### Conclusion
 Virtual Threads make it easier to write concurrent code without worrying too much about performance and thread limits.
+
+--- 
+
+## Pattern Matching
+
+This example shows how Pattern Matching works in Java.
+
+Pattern Matching makes code simpler when checking types and casting objects.
+
+---
+
+### What this example does
+
+- Checks the type of an object using `instanceof`
+- Uses `switch` to handle different types
+- Avoids manual casting
+
+---
+
+### Example
+
+```java
+if (obj instanceof String s) {
+    System.out.println(s.length());
+}
+```
+
+### Pattern Matching with switch
+```java
+return switch (obj) {
+    case String s -> "This is a String: " + s;
+    case Integer i -> "This is an Integer: " + i;
+    case null -> "Value is null";
+    default -> "Unknown type";
+};
+```
+
+### Important points
+- You can declare a variable inside `instanceof`
+- No need to cast manually
+- `switch` can now work with object types
+- Code becomes cleaner and easier to read
+
+### Before vs After
+
+Old way:
+```java
+if (obj instanceof String) {
+    String s = (String) obj;
+}
+```
+
+New way:
+```java
+if (obj instanceof String s) {
+}
+```
+
+### Conclusion
+Pattern Matching reduces boilerplate code and makes type checking safer and more readable.
