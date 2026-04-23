@@ -4,5 +4,6 @@ public class Main {
     public static void main(String[] args) {
         VirtualThreadExample.main(args);
         PatternMatchingExample.main(args);
+        RecordPatternExample.main(args);
     }
 }
