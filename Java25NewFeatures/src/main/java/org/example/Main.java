@@ -5,5 +5,6 @@ public class Main {
         VirtualThreadExample.main(args);
         PatternMatchingExample.main(args);
         RecordPatternExample.main(args);
+        SealedClassesExample.main(args);
     }
 }
