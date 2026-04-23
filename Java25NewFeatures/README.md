@@ -178,3 +178,65 @@ if (obj instanceof String s) {
 
 ### Conclusion
 Pattern Matching reduces boilerplate code and makes type checking safer and more readable.
+
+---
+
+## Record Patterns
+
+This example shows how to use Record Patterns in Java.
+
+Record Patterns allow you to extract values from objects (records) directly when checking their type.
+
+---
+
+### What this example does
+
+- Creates a `record` (User)
+- Uses pattern matching to check the type
+- Extracts fields (name and age) directly
+- Uses record patterns with `instanceof` and `switch`
+
+---
+
+### Example
+
+```java
+if (obj instanceof User(String name, int age)) {
+    System.out.println(name);
+}
+Record example
+record User(String name, int age) {}
+Using with switch
+return switch (obj) {
+    case User(String name, int age) ->
+        "User -> name: " + name + ", age: " + age;
+    default ->
+        "Unknown type";
+};
+```
+
+Important points
+- Records are simple classes used to store data
+- Record patterns let you extract values directly
+- No need to call getters like user.name()
+- Works with instanceof and switch
+
+### Before vs After
+
+#### Old way:
+```java 
+if (obj instanceof User) {
+    User u = (User) obj;
+    System.out.println(u.name());
+}
+```
+
+#### New way:
+```java 
+if (obj instanceof User(String name, int age)) {
+    System.out.println(name);
+}
+```
+
+#### Conclusion
+Record Patterns make it easier to work with objects by combining type checking and data extraction in a single step.
