@@ -240,3 +240,60 @@ if (obj instanceof User(String name, int age)) {
 
 #### Conclusion
 Record Patterns make it easier to work with objects by combining type checking and data extraction in a single step.
+
+--- 
+
+## Sealed Classes
+
+This example shows how Sealed Classes work in Java.
+Sealed Classes allow you to control which classes can extend or implement another class or interface.
+
+---
+
+### What this example does
+
+- Creates a sealed interface (`Payment`)
+- Defines which classes are allowed to implement it
+- Uses `switch` to handle all possible types
+
+---
+
+### Example
+
+```java
+sealed interface Payment permits CreditCard, Pix, Cash {}
+```
+
+### Permitted classes
+```java
+final class CreditCard implements Payment {}
+final class Pix implements Payment {}
+non-sealed class Cash implements Payment {}
+```
+
+### Important keywords
+- `sealed` → restricts who can extend or implement
+- `permits` → defines allowed classes
+- `final` → cannot be extended
+- `non-sealed` → can be extended again
+
+### Using with switch
+```java
+return switch (payment) {
+    case CreditCard c -> "Credit Card";
+    case Pix p -> "Pix";
+    case Cash c -> "Cash";
+};
+```
+
+### Important points
+- Only permitted classes can implement the sealed type
+- The compiler knows all possible types
+- No need for default in switch (if all cases are covered)
+- Helps make code safer and more predictable
+
+### Conclusion
+Sealed Classes help control inheritance and make code easier to understand and maintain.
+
+---
+
