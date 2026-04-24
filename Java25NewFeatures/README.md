@@ -297,3 +297,62 @@ Sealed Classes help control inheritance and make code easier to understand and m
 
 ---
 
+## Structured Concurrency
+
+This example shows how Structured Concurrency works in Java.
+
+Structured Concurrency is a way to run multiple tasks at the same time and manage them as a single unit.
+
+---
+
+### What this example does
+
+- Starts multiple tasks in parallel
+- Waits for all tasks to finish
+- Gets the result from each task
+
+---
+
+### Example
+
+```java
+try (var scope = StructuredTaskScope.open()) {
+
+    var task1 = scope.fork(() -> {
+        Thread.sleep(1000);
+        return "Result from Task 1";
+    });
+
+    var task2 = scope.fork(() -> {
+        Thread.sleep(500);
+        return "Result from Task 2";
+    });
+
+    scope.join();
+
+    System.out.println(task1.get());
+    System.out.println(task2.get());
+}
+```
+
+### Important points
+- `StructuredTaskScope` is used to manage tasks
+- `fork()` starts a new concurrent task
+- `join()` waits for all tasks to finish
+- `get()` retrieves the result of a task
+
+### Why use it
+- Easier to manage multiple threads
+- Cleaner code compared to manual thread handling
+- Groups tasks in a single block
+
+### Important note
+- This is a preview feature
+- API may change depending on Java version
+- You must enable preview features to use it
+
+### Conclusion
+Structured Concurrency helps organize concurrent code and makes it easier to understand and maintain.
+
+---
+
