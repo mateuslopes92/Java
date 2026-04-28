@@ -7,5 +7,6 @@ public class Main {
         RecordPatternExample.main(args);
         SealedClassesExample.main(args);
         StructuredConcurrencyExample.main(args);
+        ScopedValuesExample.main(args);
     }
 }
