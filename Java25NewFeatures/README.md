@@ -356,3 +356,64 @@ Structured Concurrency helps organize concurrent code and makes it easier to und
 
 ---
 
+## Scoped Values
+
+This example shows how Scoped Values work in Java.
+
+Scoped Values are a way to share data between methods without passing parameters.  
+They are a safer and simpler alternative to `ThreadLocal`.
+
+---
+
+### What this example does
+
+- Creates a ScopedValue (`USER`)
+- Assigns a value inside a scope
+- Accesses the value from different methods
+- Shows that the value is only available inside the scope
+
+---
+
+### Example
+
+```java
+ScopedValue.where(USER, "Mateus").run(() -> {
+    methodA();
+    methodB();
+});
+```
+
+### Creating a ScopedValue
+```java
+private static final ScopedValue<String> USER = ScopedValue.newInstance();
+```
+
+### Accessing the value
+```java
+System.out.println(USER.get());
+```
+
+### Important points
+- Values are only available inside the defined scope
+- You don’t need to pass variables between methods
+- Safer than `ThreadLocal`
+- Works well with concurrent code
+
+### Before vs After
+
+#### Old way (passing parameters):
+```java
+methodA(user);
+methodB(user);
+```
+
+#### New way (Scoped Values):
+```java
+ScopedValue.where(USER, user).run(() -> {
+    methodA();
+    methodB();
+});
+```
+
+### Conclusion
+Scoped Values make it easier to share data in a controlled way and help avoid common problems with ThreadLocal.
