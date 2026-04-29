@@ -417,3 +417,58 @@ ScopedValue.where(USER, user).run(() -> {
 
 ### Conclusion
 Scoped Values make it easier to share data in a controlled way and help avoid common problems with ThreadLocal.
+
+--- 
+
+## String Templates
+
+This example shows how String Templates work in Java.
+
+String Templates allow inserting variables directly inside strings, making the code cleaner and easier to read.
+
+---
+
+### What this example does
+
+- Creates variables (`name` and `age`)
+- Builds strings using the old way and the new way
+- Shows how string interpolation works
+
+---
+
+### Old way
+
+```java
+String message = "Name: " + name + ", Age: " + age;
+```
+
+### New way (String Templates)
+```java
+String message = STR."Name: \{name}, Age: \{age}";
+```
+
+### Important points
+- `\{}` inserts variables directly into the string
+- Code becomes cleaner and easier to read
+- Similar to template strings in other languages
+
+### Comparison
+#### Old style:
+```java 
+String message = "Hello " + name;
+```
+
+#### New style:
+```java
+String message = STR."Hello \{name}";
+```
+
+### Important note
+- String Templates are a preview feature
+- The API may change depending on the Java version
+- You must enable preview features to use it
+
+### Conclusion
+String Templates make string creation simpler and help avoid large string concatenations.
+
+--- 
