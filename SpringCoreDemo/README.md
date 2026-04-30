@@ -1,6 +1,6 @@
 # Spring Core Demo Project
 I've just created this project using `https://start.spring.io/` with:
-- Java 25 
+- Java 25
 - Maven
 - Jar
 - Spring Boot (4.0.6)
@@ -35,6 +35,44 @@ IoC and DI are fundamental concepts in the Spring Framework that help manage obj
 - Constructor Injection: Passing dependencies through a class constructor.
 - Setter Injection: Using setter methods to inject dependencies.
 - Field Injection: Directly injecting dependencies into fields (less recommended due to tight coupling).
+
+#### Dependency Injection(ApplicationContext and Component)
+- simplifies object management by allowing Spring to handle the lifecycle and dependencies of objects.
+- Annotations like `@Component` allows developers to easily define which classes should be managed by Spring.
+- Understanding how to interact with the ApplicationContext is essential for retrieving beans and managing dependencies effectively.
+
+##### Example:
+```java
+import org.springframework.stereotype.Component;
+
+@Component
+public class Dev {
+    public void build(){
+        System.out.println("Building awesome things!");
+    }
+}
+```
+```java
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ApplicationContext;
+
+@SpringBootApplication
+public class SpringCoreDemoApplication {
+
+	public static void main(String[] args) {
+		ApplicationContext context;
+
+		context = SpringApplication.run(SpringCoreDemoApplication.class, args);
+
+		Dev obj = context.getBean(Dev.class);
+
+		obj.build();
+
+	}
+
+}
+```
 
 ## Spring Boot
 Spring Boot is a tool built on top of Spring Framework that makes Spring applications easier and faster to create.
