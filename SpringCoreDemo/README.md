@@ -84,3 +84,71 @@ Main features:
 - Less configuration
 
 Spring Boot reduces boilerplate code and helps developers start projects quickly.
+
+
+## AutoWiring
+- Auto Wiring: Simplifies the process of connecting dependencies in Spring Boot applications.
+- Resolving Ambiguity: When multiple beans are present, use `@Primary` to indicate a preferred bean or `@Qualifier` to specify which bean to use.
+
+We have 3 types of Dependency Injection:
+- Field Injection: Using `@Autowired` directly on fields.
+- Constructor Injection: Passing dependencies through the constructor.
+- Setter Injection: Using setter methods to inject dependencies.
+
+```java
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
+
+@Component
+public class Dev {
+
+    @Autowired // Field injection (Connects the 2 components each other)
+    @Qualifier("laptop") // in case of confusion on 2 classes with @Component we can choose here
+    private Computer computer;
+
+//    via Constructor(default) works as well as option instead of Autowired
+//    public Dev(Computer laptop){
+//        this.computer = computer;
+//    }
+
+//    @Autowired // Setter Injection
+//    public void setLaptop(Computer computer){
+//        this.computer = computer;
+//    }
+
+    public void build(){
+
+        computer.compile();
+
+        System.out.println("Building awesome things!");
+    }
+}
+```
+
+### Handling Multiple Implementations
+- Issues that arise when multiple beans of the same type exist.
+- Solutions using: `@Primary` and `@Qualifier` annotations to resolve ambiguity.
+
+#### @Primary
+```java
+import org.springframework.context.annotation.Primary;
+import org.springframework.stereotype.Component;
+
+@Component
+//@Primary // in case of confusion on 2 classes with @Component we can choose here the primary
+public class Laptop implements Computer {
+
+    public void compile(){
+        System.out.println("Compile with 404 bugs");
+    }
+
+}
+```
+
+#### @Qualifier
+```java
+    @Autowired // Field injection (Connects the 2 components each other)
+    @Qualifier("laptop") // in case of confusion on 2 classes with @Component we can choose here
+    private Computer computer;
+```
