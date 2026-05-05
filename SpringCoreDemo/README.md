@@ -1,4 +1,4 @@
-# Spring Core Demo Project
+# Spring Boot Demo Project
 I've just created this project using `https://start.spring.io/` with:
 - Java 25
 - Maven
