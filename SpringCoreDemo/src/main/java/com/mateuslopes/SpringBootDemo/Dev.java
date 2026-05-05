@@ -1,4 +1,4 @@
-package com.mateuslopes.SpringCoreDemo;
+package com.mateuslopes.SpringBootDemo;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;

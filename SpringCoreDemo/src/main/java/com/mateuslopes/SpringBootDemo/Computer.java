@@ -1,4 +1,4 @@
-package com.mateuslopes.SpringCoreDemo;
+package com.mateuslopes.SpringBootDemo;
 
 public interface Computer {
     void compile();

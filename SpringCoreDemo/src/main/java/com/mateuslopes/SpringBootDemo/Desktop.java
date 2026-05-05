@@ -1,4 +1,4 @@
-package com.mateuslopes.SpringCoreDemo;
+package com.mateuslopes.SpringBootDemo;
 
 import org.springframework.stereotype.Component;
 
