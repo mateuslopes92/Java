@@ -132,6 +132,85 @@ Using `<constructor-arg>` tag to inject dependencies via constructors:
 <property name="age" value="12" /> <!-- primitive injection -->
 ```
 
+## Auto Wiring
+
+Auto wiring lets Spring automatically resolve and inject dependencies without explicitly defining `<property>` or `<constructor-arg>` tags.
+
+### Using Interfaces
+
+Programming to interfaces makes your code more flexible and decoupled:
+
+```java
+public interface Computer {
+    void compile();
+}
+
+public class Laptop implements Computer {
+    public void compile() {
+        System.out.println("Compiling on Laptop!");
+    }
+}
+
+public class Desktop implements Computer {
+    public void compile() {
+        System.out.println("Compiling on Desktop!");
+    }
+}
+```
+
+Now `Dev` depends on the `Computer` interface instead of a concrete class:
+
+```java
+public class Dev {
+    private Computer computer;
+
+    public void setComputer(Computer computer) {
+        this.computer = computer;
+    }
+
+    public void build() {
+        System.out.println("Building awesome things!");
+        computer.compile();
+    }
+}
+```
+
+### Auto Wiring Modes in XML
+
+You can enable auto wiring directly in the `<bean>` tag using the `autowire` attribute:
+
+**byType** - Spring matches the dependency by its type:
+```xml
+<bean id="dev" class="com.mateuslopes.Dev" autowire="byType" />
+<bean id="laptop" class="com.mateuslopes.Laptop" />
+```
+
+**byName** - Spring matches the dependency by the property name:
+```xml
+<bean id="dev" class="com.mateuslopes.Dev" autowire="byName" />
+<bean id="computer" class="com.mateuslopes.Laptop" /> <!-- name must match the property -->
+```
+
+### Handling Multiple Implementations
+
+When multiple beans of the same type exist (e.g., `Laptop` and `Desktop`), Spring throws an error because it doesn't know which one to inject.
+
+**Solution**: Define only one bean of that type, or use `primary="true"` to mark a default:
+
+```xml
+<bean id="laptop" class="com.mateuslopes.Laptop" primary="true" />
+<bean id="desktop" class="com.mateuslopes.Desktop" />
+```
+
+### Retrieving Beans by Type
+
+You can also retrieve beans using their type instead of their ID:
+
+```java
+Computer comp = context.getBean(Computer.class);
+comp.compile();
+```
+
 ## Key Differences: Spring vs Spring Boot
 
 | Feature | Spring Framework | Spring Boot |
