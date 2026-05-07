@@ -3,12 +3,21 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
-    <bean id="dev" class="com.mateuslopes.Dev">
+    <bean
+            id="dev"
+            class="com.mateuslopes.Dev"
+            autowire="byType"
+    >
 <!--        <property name="age" value="12" />-->
 <!--        <constructor-arg value="30" />-->
 <!--        <property name="laptop" ref="laptop" />-->
+<!--        <property name="computer" ref="laptop" />-->
     </bean>
 
-    <bean id="laptop" class="com.mateuslopes.Laptop">
+    <bean id="computer" class="com.mateuslopes.Laptop" primary="true">
+    </bean>
+
+    <bean id="computer1" class="com.mateuslopes.Desktop">
+
     </bean>
 </beans>
