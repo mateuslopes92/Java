@@ -6,7 +6,7 @@
     <bean id="dev" class="com.mateuslopes.Dev">
 <!--        <property name="age" value="12" />-->
 <!--        <constructor-arg value="30" />-->
-        <property name="laptop" ref="laptop" />
+<!--        <property name="laptop" ref="laptop" />-->
     </bean>
 
     <bean id="laptop" class="com.mateuslopes.Laptop">
