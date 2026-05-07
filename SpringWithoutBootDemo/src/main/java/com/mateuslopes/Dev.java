@@ -2,36 +2,31 @@ package com.mateuslopes;
 
 public class Dev {
 
-    private Laptop laptop;
-    private int age;
+    private Computer computer;
+//    private int age;
 
     public Dev(){
         System.out.println("Dev constructor");
     }
 
-    public Dev(int age) {
-        System.out.println("Constructor injection");
-        this.age = age;
+//    public int getAge() {
+//        return age;
+//    }
+//
+//    public void setAge(int age) {
+//        this.age = age;
+//    }
+
+    public Computer getComputer() {
+        return computer;
     }
 
-    public int getAge() {
-        return age;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
-    }
-
-    public Laptop getLaptop() {
-        return laptop;
-    }
-
-    public void setLaptop(Laptop laptop) {
-        this.laptop = laptop;
+    public void setComputer(Computer computer) {
+        this.computer = computer;
     }
 
     public void build(){
         System.out.println("Building awesome things!");
-        laptop.compile();
+        computer.compile();
     }
 }
