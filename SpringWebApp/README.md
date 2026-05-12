@@ -5,29 +5,55 @@ This project demonstrates how to build a web application using Spring Boot:
 - Java 25
 - Maven
 - Spring Boot 4.0.6
-- Spring Web MVC (Web application)
+- Spring Web MVC (REST API)
 - Spring DevTools (Auto-restart, LiveReload)
+- Lombok
 
-## Introduction to Web Applications with Spring
+## Project Structure (MVC Architecture)
 
-Transition from console-based applications to web applications.
-Overview of client-server architecture and database interaction.
+```
+src/main/java/com/mateuslopes/SpringWebApp/
+├── SpringWebAppApplication.java   -- Entry point
+├── controller/
+│   ├── HomeController.java        -- "/", "/about"
+│   ├── LoginController.java       -- "/login"
+│   └── ProductController.java     -- "/products"
+├── model/
+│   └── Product.java               -- Product entity
+└── service/
+    └── ProductService.java        -- Business logic / data access
+```
 
-### Client Types
+The application follows the **Model-View-Controller (MVC)** pattern:
+- **Controller** — Handles HTTP requests and returns responses
+- **Service** — Contains business logic, separate from request handling
+- **Model** — Represents the data/entity structure
 
-Web applications and mobile applications as clients.
-The role of the client in sending requests and receiving data.
+### Separation of Concerns
 
-### Data Handling
+Business logic lives in the **service layer** rather than controllers. This keeps controllers lean and focused on request handling, making the code more maintainable and testable.
 
-Modern applications primarily send data (JSON/XML) rather than layout.
-Separation of front-end (React/Angular) and back-end (Spring) responsibilities.
+### Returning Structured Data (JSON)
 
-## Creating a Spring Web Project
+Modern applications return structured data (JSON) instead of plain text or HTML. Controllers return entity data directly — Spring automatically serializes it to JSON.
 
-Setting up a Spring Boot project with web capabilities.
+```java
+@RestController
+public class ProductController {
 
-### Project Setup
+    @Autowired
+    ProductService service;
+
+    @RequestMapping("/products")
+    public List<Product> getProducts() {
+        return service.getProducts();
+    }
+}
+```
+
+**Use cases:** Returning product lists, user data, or any structured information (e.g., products in an e-commerce application).
+
+## Dependencies
 
 ```xml
 <parent>
@@ -47,43 +73,36 @@ Setting up a Spring Boot project with web capabilities.
         <scope>runtime</scope>
         <optional>true</optional>
     </dependency>
+    <dependency>
+        <groupId>org.projectlombok</groupId>
+        <artifactId>lombok</artifactId>
+        <version>1.18.42</version>
+        <scope>compile</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-webmvc-test</artifactId>
+        <scope>test</scope>
+    </dependency>
 </dependencies>
 ```
 
-Key dependencies:
-- `spring-boot-starter-webmvc` — Core Spring MVC for building web applications
-- `spring-boot-devtools` — Developer tools (auto-restart, LiveReload)
+### Key Dependencies
 
-### Application Entry Point
+| Dependency | Purpose |
+|---|---|
+| `spring-boot-starter-webmvc` | Core Spring MVC for REST APIs |
+| `spring-boot-devtools` | Auto-restart, LiveReload during development |
+| `lombok` | Reduces boilerplate code (`@Data`, `@AllArgsConstructor`) |
+| `spring-boot-starter-webmvc-test` | Testing utilities for web MVC |
 
-```java
-package com.mateuslopes.SpringWebApp;
+## Controllers
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+Controllers handle client requests. `@RestController` combines `@Controller` and `@ResponseBody` — methods return data (JSON/string) directly rather than view templates.
 
-@SpringBootApplication
-public class SpringWebAppApplication {
-
-    public static void main(String[] args) {
-        SpringApplication.run(SpringWebAppApplication.class, args);
-    }
-
-}
-```
-
-## Controller Creation
-
-Controllers handle client requests. Spring provides annotations like `@Controller` and `@RestController` to define request handling.
-
-### RestController Example
+### HomeController
 
 ```java
-package com.mateuslopes.SpringWebApp;
-
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 @RestController
 public class HomeController {
 
@@ -99,24 +118,7 @@ public class HomeController {
 }
 ```
 
-`@RestController` combines `@Controller` and `@ResponseBody`, meaning methods return data directly (JSON/XML/String) rather than view templates.
-
-## Request Mapping
-
-`@RequestMapping` maps HTTP requests to handler methods by URL path.
-
-```java
-@RequestMapping("/login")
-public String login() {
-    return "Login page!";
-}
-```
-
-Returns data instead of HTML pages.
-
-## Multiple Controllers
-
-Multiple controllers can handle different functionalities. The front controller (`DispatcherServlet`) manages requests to the appropriate controller.
+### LoginController
 
 ```java
 @RestController
@@ -129,27 +131,89 @@ public class LoginController {
 }
 ```
 
+### ProductController
+
+```java
+@RestController
+public class ProductController {
+
+    @Autowired
+    ProductService service;
+
+    @RequestMapping("/products")
+    public List<Product> getProducts() {
+        return service.getProducts();
+    }
+}
+```
+
+## Service Layer
+
+The service layer encapsulates business logic and data retrieval, keeping controllers clean.
+
+```java
+@Service
+public class ProductService {
+
+    List<Product> products = Arrays.asList(
+        new Product(1, "Iphone", 5000),
+        new Product(2, "Camera", 7000),
+        new Product(3, "Macbook", 10000)
+    );
+
+    public List<Product> getProducts() {
+        return products;
+    }
+}
+```
+
+Currently returns **dummy data** for initial testing — no database involved yet.
+
+## Model with Lombok
+
+Lombok eliminates boilerplate: `@Data` generates getters, setters, `toString`, `equals`, `hashCode`; `@AllArgsConstructor` generates a constructor with all fields.
+
+```java
+@Data
+@AllArgsConstructor
+public class Product {
+    private int prodId;
+    private String prodName;
+    private int price;
+}
+```
+
 ## Application Configuration
 
 ```properties
 spring.application.name=SpringWebApp
 ```
 
-Only the application name is configured — Spring Boot auto-configuration handles the rest.
+Spring Boot auto-configuration handles the rest.
+
+## Request Mapping Endpoints
+
+| Endpoint | Controller | Returns |
+|---|---|---|
+| `GET /` | HomeController | `"Welcome to java web!"` |
+| `GET /about` | HomeController | `"About page!"` |
+| `GET /login` | LoginController | `"Login page!"` |
+| `GET /products` | ProductController | JSON array of products |
 
 ## Key Takeaways
 
-- The Spring Framework allows for the development of robust web applications by separating concerns between the client and server.
-- Modern applications typically utilize a RESTful approach, focusing on data transfer rather than full page rendering.
-- Controllers are essential for managing requests and responses, and Spring provides powerful annotations to simplify this process.
-- The architecture supports multiple controllers, enhancing modularity and maintainability.
-- `@RestController` simplifies REST API development by combining `@Controller` and `@ResponseBody`.
+- **Request Mapping** — Mapping requests to specific endpoints is crucial for web applications.
+- **Data Formats** — JSON is the preferred format for sending structured data between server and client.
+- **Separation of Concerns** — A service layer keeps code clean by separating business logic from request handling.
+- **Lombok** — Significantly reduces boilerplate, making the codebase cleaner and easier to manage.
+- **MVC Pattern** — Always structure your application following MVC to enhance maintainability.
 
 ## Lessons Learned
 
-- Understanding the client-server model is crucial for web development.
-- Familiarity with JSON and XML is important for data representation in web applications.
+- Understand the client-server model for web development.
+- Familiarity with JSON and XML is important for data representation.
 - Properly configuring a Spring Boot project is essential for leveraging its capabilities.
-- The use of annotations in Spring simplifies the process of request handling and improves code readability.
-- The concept of a front controller is vital for routing requests to the correct handler in a web application.
+- Use tools like Postman for effective API testing.
+- Systematic debugging and restarting can resolve many unexpected issues (e.g., port conflicts, Lombok issues).
+- Spring's annotations simplify request handling and improve code readability.
 - Spring Boot's auto-configuration eliminates boilerplate, letting you focus on business logic.
