@@ -3,8 +3,7 @@ package com.mateuslopes.SpringWebApp.controller;
 import com.mateuslopes.SpringWebApp.model.Product;
 import com.mateuslopes.SpringWebApp.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -14,8 +13,19 @@ public class ProductController {
     @Autowired
     ProductService service;
 
-    @RequestMapping("/products")
+    @GetMapping("/products")
     public List<Product> getProducts(){
         return service.getProducts();
     }
+
+    @GetMapping("product/{prodId}")
+    public Product getProductById(@PathVariable int prodId){
+        return service.getProductId(prodId);
+    }
+
+    @PostMapping("product")
+    public void addProduct(@RequestBody Product product){
+        service.addProduct(product);
+    }
+
 }
