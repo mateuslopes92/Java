@@ -1,6 +1,5 @@
-package com.mateuslopes.SpringWebApp;
+package com.mateuslopes.SpringWebApp.controller;
 
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
