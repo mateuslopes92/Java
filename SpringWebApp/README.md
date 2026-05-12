@@ -17,7 +17,7 @@ src/main/java/com/mateuslopes/SpringWebApp/
 ├── controller/
 │   ├── HomeController.java        -- "/", "/about"
 │   ├── LoginController.java       -- "/login"
-│   └── ProductController.java     -- "/products"
+│   └── ProductController.java     -- Products CRUD
 ├── model/
 │   └── Product.java               -- Product entity
 └── service/
@@ -36,20 +36,6 @@ Business logic lives in the **service layer** rather than controllers. This keep
 ### Returning Structured Data (JSON)
 
 Modern applications return structured data (JSON) instead of plain text or HTML. Controllers return entity data directly — Spring automatically serializes it to JSON.
-
-```java
-@RestController
-public class ProductController {
-
-    @Autowired
-    ProductService service;
-
-    @RequestMapping("/products")
-    public List<Product> getProducts() {
-        return service.getProducts();
-    }
-}
-```
 
 **Use cases:** Returning product lists, user data, or any structured information (e.g., products in an e-commerce application).
 
@@ -96,9 +82,72 @@ public class ProductController {
 | `lombok` | Reduces boilerplate code (`@Data`, `@AllArgsConstructor`) |
 | `spring-boot-starter-webmvc-test` | Testing utilities for web MVC |
 
-## Controllers
+## Product API (CRUD Operations)
 
-Controllers handle client requests. `@RestController` combines `@Controller` and `@ResponseBody` — methods return data (JSON/string) directly rather than view templates.
+The `ProductController` exposes RESTful endpoints for managing products. It interacts with the `ProductService` which currently holds an **in-memory list** (no database yet).
+
+### ProductController
+
+```java
+@RestController
+public class ProductController {
+
+    @Autowired
+    ProductService service;
+
+    @GetMapping("/products")
+    public List<Product> getProducts() {
+        return service.getProducts();
+    }
+
+    @GetMapping("product/{prodId}")
+    public Product getProductById(@PathVariable int prodId) {
+        return service.getProductId(prodId);
+    }
+
+    @PostMapping("product")
+    public void addProduct(@RequestBody Product product) {
+        service.addProduct(product);
+    }
+}
+```
+
+- `@PathVariable` extracts values from the URI path, enabling **dynamic endpoints** (e.g., `/product/1`, `/product/2`).
+- `@RequestBody` binds the HTTP request body to a Java object — Spring automatically deserializes incoming JSON into the `Product` model.
+
+### ProductService
+
+```java
+@Service
+public class ProductService {
+
+    List<Product> products = new ArrayList<>(Arrays.asList(
+        new Product(1, "Iphone", 5000),
+        new Product(2, "Camera", 7000),
+        new Product(3, "Macbook", 10000)
+    ));
+
+    public List<Product> getProducts() {
+        return products;
+    }
+
+    public Product getProductId(int prodId) {
+        return products
+                .stream()
+                .filter(p -> p.getProdId() == prodId)
+                .findFirst()
+                .get();
+    }
+
+    public void addProduct(Product product) {
+        products.add(product);
+    }
+}
+```
+
+The list is wrapped in `new ArrayList<>()` to keep it **mutable** — newly added products persist at runtime.
+
+## Other Controllers
 
 ### HomeController
 
@@ -131,44 +180,6 @@ public class LoginController {
 }
 ```
 
-### ProductController
-
-```java
-@RestController
-public class ProductController {
-
-    @Autowired
-    ProductService service;
-
-    @RequestMapping("/products")
-    public List<Product> getProducts() {
-        return service.getProducts();
-    }
-}
-```
-
-## Service Layer
-
-The service layer encapsulates business logic and data retrieval, keeping controllers clean.
-
-```java
-@Service
-public class ProductService {
-
-    List<Product> products = Arrays.asList(
-        new Product(1, "Iphone", 5000),
-        new Product(2, "Camera", 7000),
-        new Product(3, "Macbook", 10000)
-    );
-
-    public List<Product> getProducts() {
-        return products;
-    }
-}
-```
-
-Currently returns **dummy data** for initial testing — no database involved yet.
-
 ## Model with Lombok
 
 Lombok eliminates boilerplate: `@Data` generates getters, setters, `toString`, `equals`, `hashCode`; `@AllArgsConstructor` generates a constructor with all fields.
@@ -191,29 +202,41 @@ spring.application.name=SpringWebApp
 
 Spring Boot auto-configuration handles the rest.
 
-## Request Mapping Endpoints
+## API Endpoints
 
-| Endpoint | Controller | Returns |
-|---|---|---|
-| `GET /` | HomeController | `"Welcome to java web!"` |
-| `GET /about` | HomeController | `"About page!"` |
-| `GET /login` | LoginController | `"Login page!"` |
-| `GET /products` | ProductController | JSON array of products |
+| Method | Endpoint | Controller | Description |
+|--------|----------|------------|-------------|
+| GET | `/` | HomeController | Welcome message |
+| GET | `/about` | HomeController | About page |
+| GET | `/login` | LoginController | Login page |
+| GET | `/products` | ProductController | List all products |
+| GET | `/product/{prodId}` | ProductController | Get product by ID |
+| POST | `/product` | ProductController | Add a new product |
+
+## Testing with Postman
+
+Use Postman to interact with the API:
+
+- **GET /products** — Returns the full product list as a JSON array.
+- **GET /product/1** — Returns the product with ID 1 (404 if not found).
+- **POST /product** — Send a JSON body like `{"prodId": 4, "prodName": "Mouse", "price": 100}` to add a product. No response body on success.
+
+Pay attention to **HTTP status codes** in responses (200 for success, 404 for not found, etc.) — they are crucial for diagnosing API issues.
 
 ## Key Takeaways
 
-- **Request Mapping** — Mapping requests to specific endpoints is crucial for web applications.
-- **Data Formats** — JSON is the preferred format for sending structured data between server and client.
+- **REST APIs** use endpoints to perform operations on resources like products.
+- **Structured data** (JSON) is the standard format for server-client data interchange.
 - **Separation of Concerns** — A service layer keeps code clean by separating business logic from request handling.
 - **Lombok** — Significantly reduces boilerplate, making the codebase cleaner and easier to manage.
-- **MVC Pattern** — Always structure your application following MVC to enhance maintainability.
+- **Dynamic endpoints** with path variables allow flexible and reusable API design.
+- **Understanding status codes** is crucial for diagnosing issues with API requests.
 
 ## Lessons Learned
 
-- Understand the client-server model for web development.
-- Familiarity with JSON and XML is important for data representation.
 - Properly configuring a Spring Boot project is essential for leveraging its capabilities.
-- Use tools like Postman for effective API testing.
+- Use tools like Postman for effective API testing and debugging.
 - Systematic debugging and restarting can resolve many unexpected issues (e.g., port conflicts, Lombok issues).
-- Spring's annotations simplify request handling and improve code readability.
+- Familiarity with converting between JSON and Java objects is important for data interchange in APIs.
 - Spring Boot's auto-configuration eliminates boilerplate, letting you focus on business logic.
+- Structuring your application following MVC enhances maintainability.
