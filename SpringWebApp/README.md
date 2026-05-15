@@ -109,11 +109,23 @@ public class ProductController {
     public void addProduct(@RequestBody Product product) {
         service.addProduct(product);
     }
+
+    @PutMapping("/products")
+    public void updateProduct(@RequestBody Product product) {
+        service.updateProduct(product);
+    }
+
+    @DeleteMapping("product/{prodId}")
+    public void deleteProduct(@PathVariable int prodId) {
+        service.deleteProduct(prodId);
+    }
 }
 ```
 
 - `@PathVariable` extracts values from the URI path, enabling **dynamic endpoints** (e.g., `/product/1`, `/product/2`).
 - `@RequestBody` binds the HTTP request body to a Java object — Spring automatically deserializes incoming JSON into the `Product` model.
+- `@PutMapping` maps HTTP PUT requests — used for updating existing resources.
+- `@DeleteMapping` maps HTTP DELETE requests — used for removing resources.
 
 ### ProductService
 
@@ -141,6 +153,26 @@ public class ProductService {
 
     public void addProduct(Product product) {
         products.add(product);
+    }
+
+    public void updateProduct(Product product) {
+        int index = 0;
+        for (int i = 0; i < products.size(); i++) {
+            if (products.get(i).getProdId() == product.getProdId()) {
+                index = i;
+            }
+        }
+        products.set(index, product);
+    }
+
+    public void deleteProduct(int prodId) {
+        int index = 0;
+        for (int i = 0; i < products.size(); i++) {
+            if (products.get(i).getProdId() == prodId) {
+                index = i;
+            }
+        }
+        products.remove(index);
     }
 }
 ```
@@ -212,6 +244,19 @@ Spring Boot auto-configuration handles the rest.
 | GET | `/products` | ProductController | List all products |
 | GET | `/product/{prodId}` | ProductController | Get product by ID |
 | POST | `/product` | ProductController | Add a new product |
+| PUT | `/products` | ProductController | Update an existing product |
+| DELETE | `/product/{prodId}` | ProductController | Delete a product by ID |
+
+## HTTP Methods (CRUD Operations)
+
+| Method | Operation | Description |
+|--------|-----------|-------------|
+| **GET** | Read | Fetch one or more resources |
+| **POST** | Create | Add a new resource |
+| **PUT** | Update | Replace an existing resource |
+| **DELETE** | Delete | Remove a resource |
+
+These four operations make up **CRUD** — the foundation of most RESTful APIs.
 
 ## Testing with Postman
 
@@ -220,23 +265,29 @@ Use Postman to interact with the API:
 - **GET /products** — Returns the full product list as a JSON array.
 - **GET /product/1** — Returns the product with ID 1 (404 if not found).
 - **POST /product** — Send a JSON body like `{"prodId": 4, "prodName": "Mouse", "price": 100}` to add a product. No response body on success.
+- **PUT /products** — Send a JSON body with updated fields, e.g., `{"prodId": 3, "prodName": "Macbook Pro", "price": 15000}`. Replaces the product at the matching index.
+- **DELETE /product/3** — Deletes the product with ID 3 from the list.
 
 Pay attention to **HTTP status codes** in responses (200 for success, 404 for not found, etc.) — they are crucial for diagnosing API issues.
 
 ## Key Takeaways
 
-- **REST APIs** use endpoints to perform operations on resources like products.
+- **CRUD Operations** — Implement Create, Read, Update, and Delete operations in a Spring Boot application.
+- **HTTP Methods** — GET (read), POST (create), PUT (update), DELETE (delete) each map to specific operations in RESTful APIs.
 - **Structured data** (JSON) is the standard format for server-client data interchange.
 - **Separation of Concerns** — A service layer keeps code clean by separating business logic from request handling.
 - **Lombok** — Significantly reduces boilerplate, making the codebase cleaner and easier to manage.
 - **Dynamic endpoints** with path variables allow flexible and reusable API design.
 - **Understanding status codes** is crucial for diagnosing issues with API requests.
+- **Debugging** — Use tools like Postman to test and debug API endpoints (e.g., unsupported media types, method not allowed errors).
 
 ## Lessons Learned
 
 - Properly configuring a Spring Boot project is essential for leveraging its capabilities.
 - Use tools like Postman for effective API testing and debugging.
-- Systematic debugging and restarting can resolve many unexpected issues (e.g., port conflicts, Lombok issues).
+- Systematic debugging and restarting can resolve many unexpected issues (e.g., port conflicts, Lombok issues, unsupported media types).
 - Familiarity with converting between JSON and Java objects is important for data interchange in APIs.
 - Spring Boot's auto-configuration eliminates boilerplate, letting you focus on business logic.
 - Structuring your application following MVC enhances maintainability.
+- Manual data management (in-memory lists) has limitations — real-world applications need a database (e.g., Spring Data JPA).
+- Following the **DRY principle** avoids code repetition and keeps the codebase clean.
