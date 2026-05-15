@@ -8,8 +8,10 @@ This project demonstrates how to build a web application using Spring Boot:
 - Spring Web MVC (REST API)
 - Spring DevTools (Auto-restart, LiveReload)
 - Lombok
+- Spring Data JPA
+- H2 Database (in-memory)
 
-## Project Structure (MVC Architecture)
+## Project Structure (MVC Architecture + Repository Layer)
 
 ```
 src/main/java/com/mateuslopes/SpringWebApp/
@@ -20,14 +22,22 @@ src/main/java/com/mateuslopes/SpringWebApp/
 │   └── ProductController.java     -- Products CRUD
 ├── model/
 │   └── Product.java               -- Product entity
+├── repository/
+│   └── ProductRepository.java     -- Database access layer
 └── service/
     └── ProductService.java        -- Business logic / data access
 ```
 
-The application follows the **Model-View-Controller (MVC)** pattern:
+The application follows a layered architecture:
+
+```
+Client (Postman) → Controller → Service → Repository → Database
+```
+
 - **Controller** — Handles HTTP requests and returns responses
 - **Service** — Contains business logic, separate from request handling
-- **Model** — Represents the data/entity structure
+- **Repository** — Connects to the database, performs CRUD operations
+- **Model** — Represents the data/entity structure mapped to a database table
 
 ### Separation of Concerns
 
@@ -78,8 +88,10 @@ Modern applications return structured data (JSON) instead of plain text or HTML.
 | Dependency | Purpose |
 |---|---|
 | `spring-boot-starter-webmvc` | Core Spring MVC for REST APIs |
+| `spring-boot-starter-data-jpa` | Spring Data JPA for database interaction |
 | `spring-boot-devtools` | Auto-restart, LiveReload during development |
 | `lombok` | Reduces boilerplate code (`@Data`, `@AllArgsConstructor`) |
+| `com.h2database:h2` | H2 in-memory database driver |
 | `spring-boot-starter-webmvc-test` | Testing utilities for web MVC |
 
 ## Product API (CRUD Operations)
@@ -226,10 +238,79 @@ public class Product {
 }
 ```
 
+## Spring Data JPA
+
+### Why a Database?
+
+The service layer currently holds **hardcoded data** in an in-memory list. This data is lost on restart and cannot scale. Real applications persist data in a **database**.
+
+### Java Database Connectivity (JDBC)
+
+**JDBC** is the traditional Java API for database operations. It requires:
+1. Loading a driver
+2. Opening a connection
+3. Writing raw SQL queries
+4. Processing `ResultSet` manually
+5. Handling connections, statements, result sets
+
+**Spring JDBC** simplifies this with `JdbcTemplate`, reducing boilerplate.
+
+### Object-Relational Mapping (ORM)
+
+**ORM** maps Java objects to database tables and vice versa:
+
+```
+Product object (Java)  ←→  products table (Database)
+```
+
+The **Java Persistence API (JPA)** is a standard specification for ORM. **Hibernate** is the most popular JPA implementation. Using JPA standardizes your code — you can switch ORM providers without changing your code.
+
+### Spring Data JPA
+
+**Spring Data JPA** builds on top of JPA and Hibernate, further simplifying data access. You define a **repository interface** and Spring provides the implementation at runtime — no manual coding needed.
+
+### Dependencies
+
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-data-jpa</artifactId>
+</dependency>
+
+<dependency>
+    <groupId>com.h2database</groupId>
+    <artifactId>h2</artifactId>
+    <scope>runtime</scope>
+</dependency>
+```
+
+### H2 Database Configuration
+
+**H2** is an in-memory database, ideal for development and testing. Configure it in `application.properties`:
+
+```properties
+spring.application.name=SpringWebApp
+
+spring.datasource.url=jdbc:h2:mem:testdb
+spring.datasource.driverClassName=org.h2.Driver
+spring.datasource.username=sa
+spring.datasource.password=password
+spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
+spring.h2.console.enabled=true
+```
+
+The **H2 console** is accessible at `/h2-console` in the browser, allowing you to inspect tables and run queries during development.
+
 ## Application Configuration
 
 ```properties
 spring.application.name=SpringWebApp
+spring.datasource.url=jdbc:h2:mem:testdb
+spring.datasource.driverClassName=org.h2.Driver
+spring.datasource.username=sa
+spring.datasource.password=password
+spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
+spring.h2.console.enabled=true
 ```
 
 Spring Boot auto-configuration handles the rest.
@@ -276,6 +357,11 @@ Pay attention to **HTTP status codes** in responses (200 for success, 404 for no
 - **HTTP Methods** — GET (read), POST (create), PUT (update), DELETE (delete) each map to specific operations in RESTful APIs.
 - **Structured data** (JSON) is the standard format for server-client data interchange.
 - **Separation of Concerns** — A service layer keeps code clean by separating business logic from request handling.
+- **Repository Layer** — Connects controllers/service to the database, abstracting away raw SQL.
+- **ORM with JPA** — ORM tools like Hibernate/JPA significantly reduce database interaction complexity.
+- **Spring Data JPA** — Essential for database interactions; automatically provides CRUD implementations from a repository interface.
+- **H2 Database** — Convenient in-memory database for development and testing.
+- **Future-Proofing** — Adopting JPA standards allows easier transitions between ORM implementations.
 - **Lombok** — Significantly reduces boilerplate, making the codebase cleaner and easier to manage.
 - **Dynamic endpoints** with path variables allow flexible and reusable API design.
 - **Understanding status codes** is crucial for diagnosing issues with API requests.
@@ -291,3 +377,7 @@ Pay attention to **HTTP status codes** in responses (200 for success, 404 for no
 - Structuring your application following MVC enhances maintainability.
 - Manual data management (in-memory lists) has limitations — real-world applications need a database (e.g., Spring Data JPA).
 - Following the **DRY principle** avoids code repetition and keeps the codebase clean.
+- Always verify that the correct dependencies are included in your project (e.g., JPA, H2 driver).
+- Understand how Java objects map to database tables — it is fundamental for effective data management with ORM.
+- Familiarize yourself with the H2 console for easy database management during development.
+- Errors during setup (missing URL, driver not found) are valuable learning opportunities for debugging configuration issues.
