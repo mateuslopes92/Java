@@ -1,54 +1,35 @@
 package com.mateuslopes.SpringWebApp.service;
 
 import com.mateuslopes.SpringWebApp.model.Product;
+import com.mateuslopes.SpringWebApp.repository.ProductRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Service
 public class ProductService {
 
-    List<Product> products = new ArrayList<>(Arrays.asList(
-            new Product(1, "Iphone", 5000),
-            new Product(2, "Camera", 7000),
-            new Product(3, "Macbook", 10000)
-    ));
+    @Autowired
+    ProductRepository productRepository;
 
     public List<Product> getProducts(){
-        return products;
+        return productRepository.findAll();
     }
 
     public Product getProductId(int prodId) {
-        return products
-                .stream()
-                .filter(p -> p.getProdId() == prodId)
-                .findFirst()
-                .get();
+        return productRepository.findById(prodId).orElse(new Product());
     }
 
     public void addProduct(Product product){
-        products.add(product);
+        productRepository.save(product);
     }
 
     public void updateProduct(Product product) {
-        int index = 0;
-        for(int i = 0; i < products.size(); i++){
-            if(products.get(i).getProdId() == product.getProdId()){
-                index = i;
-            }
-        }
-        products.set(index, product);
+        productRepository.save(product);
     }
 
     public void deleteProduct(int prodId) {
-        int index = 0;
-        for(int i = 0; i < products.size(); i++){
-            if(products.get(i).getProdId() == prodId){
-                index = i;
-            }
-        }
-        products.remove(index);
+        productRepository.deleteById(prodId);
     }
 }
