@@ -96,7 +96,7 @@ Modern applications return structured data (JSON) instead of plain text or HTML.
 
 ## Product API (CRUD Operations)
 
-The `ProductController` exposes RESTful endpoints for managing products. It interacts with the `ProductService` which currently holds an **in-memory list** (no database yet).
+The `ProductController` exposes RESTful endpoints for managing products. It interacts with the `ProductService` which uses a **JPA repository** to persist data in the H2 database.
 
 ### ProductController
 
@@ -145,51 +145,32 @@ public class ProductController {
 @Service
 public class ProductService {
 
-    List<Product> products = new ArrayList<>(Arrays.asList(
-        new Product(1, "Iphone", 5000),
-        new Product(2, "Camera", 7000),
-        new Product(3, "Macbook", 10000)
-    ));
+    @Autowired
+    ProductRepository productRepository;
 
     public List<Product> getProducts() {
-        return products;
+        return productRepository.findAll();
     }
 
     public Product getProductId(int prodId) {
-        return products
-                .stream()
-                .filter(p -> p.getProdId() == prodId)
-                .findFirst()
-                .get();
+        return productRepository.findById(prodId).orElse(new Product());
     }
 
     public void addProduct(Product product) {
-        products.add(product);
+        productRepository.save(product);
     }
 
     public void updateProduct(Product product) {
-        int index = 0;
-        for (int i = 0; i < products.size(); i++) {
-            if (products.get(i).getProdId() == product.getProdId()) {
-                index = i;
-            }
-        }
-        products.set(index, product);
+        productRepository.save(product);
     }
 
     public void deleteProduct(int prodId) {
-        int index = 0;
-        for (int i = 0; i < products.size(); i++) {
-            if (products.get(i).getProdId() == prodId) {
-                index = i;
-            }
-        }
-        products.remove(index);
+        productRepository.deleteById(prodId);
     }
 }
 ```
 
-The list is wrapped in `new ArrayList<>()` to keep it **mutable** — newly added products persist at runtime.
+The service delegates all data access to the repository — no manual list management, no SQL boilerplate. Spring Data JPA generates the queries at runtime.
 
 ## Other Controllers
 
@@ -224,19 +205,32 @@ public class LoginController {
 }
 ```
 
-## Model with Lombok
+## Product Entity with JPA & Lombok
 
-Lombok eliminates boilerplate: `@Data` generates getters, setters, `toString`, `equals`, `hashCode`; `@AllArgsConstructor` generates a constructor with all fields.
+`Product` is a JPA entity mapped to the `product` database table:
 
 ```java
 @Data
-@AllArgsConstructor
+@NoArgsConstructor
+@Entity
 public class Product {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int prodId;
     private String prodName;
     private int price;
+
 }
 ```
+
+- **`@Entity`** — Marks the class as a database entity mapped to a table.
+- **`@Id`** — Defines the primary key.
+- **`@GeneratedValue(strategy = GenerationType.IDENTITY)`** — Auto-increments the ID on insert.
+- **`@Data`** (Lombok) — Generates getters, setters, `toString`, `equals`, `hashCode`.
+- **`@NoArgsConstructor`** (Lombok) — Required no-arg constructor for JPA.
+
+Without getters/setters, Jackson cannot deserialize incoming JSON into the object, causing all fields to save as defaults (0, null).
 
 ## Spring Data JPA
 
@@ -280,7 +274,6 @@ The **Java Persistence API (JPA)** is a standard specification for ORM. **Hibern
 <dependency>
     <groupId>com.h2database</groupId>
     <artifactId>h2</artifactId>
-    <scope>runtime</scope>
 </dependency>
 ```
 
@@ -297,9 +290,42 @@ spring.datasource.username=sa
 spring.datasource.password=password
 spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
 spring.h2.console.enabled=true
+spring.h2.console.path=/h2-console
 ```
 
 The **H2 console** is accessible at `/h2-console` in the browser, allowing you to inspect tables and run queries during development.
+
+### Repository Layer
+
+The repository separates data access logic from service/business logic:
+
+```java
+@Repository
+public interface ProductRepository extends JpaRepository<Product, Integer> {
+}
+```
+
+By extending `JpaRepository`, the interface inherits CRUD methods (`findAll`, `findById`, `save`, `deleteById`) — Spring Data JPA generates the SQL queries automatically at runtime.
+
+### H2 Console Servlet Registration
+
+Spring Boot 4.0.6 does not auto-register the H2 console servlet. A `WebConfig` class explicitly registers it using the Jakarta-compatible servlet:
+
+```java
+@Configuration
+public class WebConfig {
+
+    @Bean
+    ServletRegistrationBean<JakartaWebServlet> h2ConsoleServletRegistration() {
+        ServletRegistrationBean<JakartaWebServlet> registrationBean =
+                new ServletRegistrationBean<>(new JakartaWebServlet(), "/h2-console/*");
+        registrationBean.setLoadOnStartup(1);
+        return registrationBean;
+    }
+}
+```
+
+Without this explicit registration, accessing `/h2-console` returns a 404.
 
 ## Application Configuration
 
@@ -341,43 +367,40 @@ These four operations make up **CRUD** — the foundation of most RESTful APIs.
 
 ## Testing with Postman
 
-Use Postman to interact with the API:
+Use Postman to interact with the API (all requests send `Content-Type: application/json`):
 
 - **GET /products** — Returns the full product list as a JSON array.
 - **GET /product/1** — Returns the product with ID 1 (404 if not found).
-- **POST /product** — Send a JSON body like `{"prodId": 4, "prodName": "Mouse", "price": 100}` to add a product. No response body on success.
-- **PUT /products** — Send a JSON body with updated fields, e.g., `{"prodId": 3, "prodName": "Macbook Pro", "price": 15000}`. Replaces the product at the matching index.
-- **DELETE /product/3** — Deletes the product with ID 3 from the list.
+- **POST /product** — Send a JSON body like `{"prodName": "Mouse", "price": 100}` to add a product. Do **not** include `prodId` — it is auto-generated by the database. No response body on success.
+- **PUT /products** — Send a JSON body with all fields, e.g., `{"prodId": 1, "prodName": "Macbook Pro", "price": 15000}`. Replaces the existing product.
+- **DELETE /product/1** — Deletes the product with ID 1 from the database.
 
 Pay attention to **HTTP status codes** in responses (200 for success, 404 for not found, etc.) — they are crucial for diagnosing API issues.
 
 ## Key Takeaways
 
-- **CRUD Operations** — Implement Create, Read, Update, and Delete operations in a Spring Boot application.
-- **HTTP Methods** — GET (read), POST (create), PUT (update), DELETE (delete) each map to specific operations in RESTful APIs.
+- **Repository Pattern** — The repository layer is crucial for data management and should be separated from the service/business logic layer.
+- **Spring JPA Magic** — Spring Data JPA simplifies database interactions by automatically generating SQL queries from repository method names.
+- **Entity Annotations** — Proper use of annotations like `@Entity`, `@Id`, and `@GeneratedValue` is essential for defining database tables and primary keys.
+- **CRUD Operations** — Basic CRUD operations can be performed with minimal code using `findAll`, `findById`, `save`, and `deleteById` from `JpaRepository`.
+- **Get/Set Methods** — JPA entities need getters and setters (via Lombok `@Data` or manually) for Jackson to deserialize JSON request bodies correctly. Without them, fields default to 0/null.
+- **Auto-Generated IDs** — Use `@GeneratedValue` so the database handles ID assignment — the client should not send an ID when creating resources.
+- **H2 Console** — Spring Boot 4.0.6 no longer auto-registers the H2 console servlet; it must be registered manually with a `@Configuration` class.
+- **Jakarta Servlet** — Modern Spring Boot uses Jakarta Servlet 5+; register `JakartaWebServlet` instead of the legacy `WebServlet`.
 - **Structured data** (JSON) is the standard format for server-client data interchange.
 - **Separation of Concerns** — A service layer keeps code clean by separating business logic from request handling.
-- **Repository Layer** — Connects controllers/service to the database, abstracting away raw SQL.
-- **ORM with JPA** — ORM tools like Hibernate/JPA significantly reduce database interaction complexity.
-- **Spring Data JPA** — Essential for database interactions; automatically provides CRUD implementations from a repository interface.
-- **H2 Database** — Convenient in-memory database for development and testing.
-- **Future-Proofing** — Adopting JPA standards allows easier transitions between ORM implementations.
 - **Lombok** — Significantly reduces boilerplate, making the codebase cleaner and easier to manage.
 - **Dynamic endpoints** with path variables allow flexible and reusable API design.
-- **Understanding status codes** is crucial for diagnosing issues with API requests.
-- **Debugging** — Use tools like Postman to test and debug API endpoints (e.g., unsupported media types, method not allowed errors).
 
 ## Lessons Learned
 
 - Properly configuring a Spring Boot project is essential for leveraging its capabilities.
 - Use tools like Postman for effective API testing and debugging.
-- Systematic debugging and restarting can resolve many unexpected issues (e.g., port conflicts, Lombok issues, unsupported media types).
-- Familiarity with converting between JSON and Java objects is important for data interchange in APIs.
-- Spring Boot's auto-configuration eliminates boilerplate, letting you focus on business logic.
-- Structuring your application following MVC enhances maintainability.
-- Manual data management (in-memory lists) has limitations — real-world applications need a database (e.g., Spring Data JPA).
-- Following the **DRY principle** avoids code repetition and keeps the codebase clean.
-- Always verify that the correct dependencies are included in your project (e.g., JPA, H2 driver).
+- Systematic debugging and restarting can resolve many unexpected issues (e.g., port conflicts, Lombok issues, unsupported media types, missing servlet registration).
+- Familiarity with converting between JSON and Java objects is important for data interchange in APIs — Jackson relies on setters to populate entity fields.
+- Spring Boot's auto-configuration eliminates boilerplate, but not all features are auto-configured in every version — verify which auto-configurations are available.
+- Structuring your application following MVC + Repository pattern enhances maintainability and testability.
+- Real-world applications need a database (JPA + H2) instead of in-memory lists for persistent, scalable data management.
+- Always verify that the correct dependencies are included in your project (e.g., JPA, H2 driver) and that their scopes allow compile-time access when referencing classes in code.
 - Understand how Java objects map to database tables — it is fundamental for effective data management with ORM.
-- Familiarize yourself with the H2 console for easy database management during development.
-- Errors during setup (missing URL, driver not found) are valuable learning opportunities for debugging configuration issues.
+- Errors during setup (missing URL, driver not found, servlet not registered) are valuable learning opportunities for debugging configuration issues.
