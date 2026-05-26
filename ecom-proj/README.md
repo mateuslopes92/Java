@@ -178,7 +178,7 @@ public class Product {
 
 ## API Endpoints
 
-All endpoints are prefixed with `/api`.
+All endpoints are prefixed with `/api`. The controller is annotated with `@CrossOrigin` to allow cross-origin requests from the frontend (`ecom-frontend-1`), which runs on a different port.
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
