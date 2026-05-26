@@ -43,23 +43,9 @@ spring.jpa.defer-datasource-initialization=true
 - `show-sql=true` — logs generated SQL queries for debugging
 - H2 console available at `/h2-console` to inspect tables and run queries
 
-### Greeting Endpoint (Smoke Test)
+### Greeting Endpoint (Smoke Test — Replaced)
 
-A simple endpoint was created to verify the server is running before building out the full API:
-
-```java
-@RestController
-@RequestMapping("/api")
-public class ProductController {
-
-    @RequestMapping("/")
-    public String greet() {
-        return "Hello";
-    }
-}
-```
-
-Always test endpoints after setup to ensure they function as expected before moving to more complex features.
+The initial greeting endpoint at `GET /api/` was replaced once the full API was built out. The `/api/products` endpoint now serves as the primary entry point, returning the full product list wrapped in a `ResponseEntity` with proper HTTP status codes.
 
 ## Project Structure
 
@@ -109,6 +95,10 @@ public class ProductService {
     public List<Product> getAllProducts() {
         return productRepository.findAll();
     }
+
+    public Product getProductById(int id) {
+        return productRepository.findById(id).orElse(null);
+    }
 }
 ```
 
@@ -152,7 +142,7 @@ The `Product` entity is mapped to a database table with the following fields:
 | `brand` | `String` | Brand name |
 | `price` | `BigDecimal` | Product price |
 | `category` | `String` | Product category |
-| `releaseDate` | `Date` | Release date |
+| `releaseDate` | `Date` | Release date (formatted as `dd-MM-yyyy` via `@JsonFormat`) |
 | `available` | `boolean` | Availability status |
 | `quantity` | `int` | Stock quantity |
 
@@ -170,6 +160,8 @@ public class Product {
     private String brand;
     private BigDecimal price;
     private String category;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private Date releaseDate;
     private boolean available;
     private int quantity;
@@ -182,8 +174,44 @@ All endpoints are prefixed with `/api`. The controller is annotated with `@Cross
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | `/api/` | Welcome message |
 | GET | `/api/products` | List all products |
+| GET | `/api/product/{id}` | Get a single product by ID |
+
+### ResponseEntity & HTTP Status Codes
+
+The controller uses `ResponseEntity` to wrap responses with proper HTTP status codes:
+
+```java
+@RequestMapping("/products")
+public ResponseEntity<List<Product>> getAllProducts(){
+    return new ResponseEntity<>(productService.getAllProducts(), HttpStatus.OK);
+}
+
+@GetMapping("/product/{id}")
+public ResponseEntity<Product> getProduct(@PathVariable int id){
+    Product product = productService.getProductById(id);
+
+    if(product != null)
+        return new ResponseEntity<>(product, HttpStatus.OK);
+    else
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+}
+```
+
+- `200 OK` — returned when the requested product exists
+- `404 Not Found` — returned when no product matches the given ID
+- Using `ResponseEntity` gives explicit control over the response status, headers, and body
+
+### Date Formatting with Jackson
+
+The `releaseDate` field uses `@JsonFormat` to control how dates are serialized to JSON:
+
+```java
+@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
+private Date releaseDate;
+```
+
+Without this annotation, Jackson would serialize `Date` as a timestamp (milliseconds since epoch). With `@JsonFormat`, the date is sent as a human-readable string (e.g., `"01-01-2025"`).
 
 ## Dependencies
 
@@ -214,9 +242,13 @@ All endpoints are prefixed with `/api`. The controller is annotated with `@Cross
 - **Database Configuration** — Configuring the database connection and JPA settings correctly saves debugging time later. H2 is ideal for development — no installation, data resets on restart.
 - **Model Representation** — Defining a clear entity model with JPA annotations is essential for managing application data. Using `ddl-auto=update` lets Hibernate create tables automatically.
 - **Lombok** — Significantly reduces boilerplate code (`@Data`, `@AllArgsConstructor`, `@NoArgsConstructor`), keeping the codebase clean and maintainable.
-- **RESTful Services** — Implementing a basic REST controller early helps verify the server is working before building more complex features.
+- **RESTful Services** — Implementing endpoints with `ResponseEntity` and proper HTTP status codes ensures effective communication between frontend and backend.
 - **Initial Data** — Use `data.sql` with `defer-datasource-initialization=true` to seed default data in H2 without schema conflicts.
 - **Testing Endpoints** — Regularly test API endpoints using Postman to ensure they return expected results.
+- **Product Detail View** — The frontend now allows users to click on individual products to view more details via a new Product component at `/product/{id}`.
+- **Backend Product Lookup** — A new service method (`getProductById`) and controller endpoint (`GET /api/product/{id}`) handle fetching a single product by its ID.
+- **Null Safety** — The service layer returns `null` when a product is not found, and the controller responds with `404 Not Found`.
+- **Date Formatting** — Jackson's `@JsonFormat` annotation formats the `releaseDate` field as a readable string (`dd-MM-yyyy`) instead of a raw timestamp.
 
 ## Lessons Learned
 
@@ -224,7 +256,11 @@ All endpoints are prefixed with `/api`. The controller is annotated with `@Cross
 - **Database Management** — Ensure the database schema is created before attempting to insert data. `defer-datasource-initialization=true` ensures data.sql runs after Hibernate DDL.
 - **Data Persistence** — H2 is temporary — data resets on every restart. Use `data.sql` for seed data during development.
 - **Testing** — Regularly test API endpoints using tools like Postman to verify expected results.
-- **Data Formatting** — Consider user-friendly formats for data presentation, especially dates.
+- **Data Formatting** — Jackson's `@JsonFormat` provides clean, human-readable date serialization. Always consider the client-side experience when formatting dates.
+- **Frontend-Backend Integration** — Connecting frontend requests (`/product/{id}`) to backend services is essential for dynamic, data-driven applications.
+- **Error Handling** — Always check for null values and handle missing resources gracefully. Returning `404 Not Found` for missing products improves user experience and client-side logic.
+- **HTTP Status Codes** — Using the correct status codes (`200 OK`, `404 Not Found`) helps manage client-side logic effectively, allowing for better error handling and user feedback.
+- **Iterative Development** — The development process is continuous; always look for ways to enhance functionality and user experience in future updates.
 
 ## Related Frontend
 
@@ -249,6 +285,19 @@ The front-end and back-end are fully separated and communicate exclusively via R
 - Data is fetched from the backend API using HTTP requests (via **Axios**)
 - State management with React hooks like `useState` handles the data within components
 - Components re-render automatically when state changes
+- **React Context API** is used to share global state (product list, cart) across components
+
+### Product Detail Page
+
+The frontend includes a `Product` component at `/product/:id` that fetches and displays a single product's details:
+
+- Product category, name, brand, and description
+- Price with an "Add to Cart" button
+- Stock availability and quantity
+- Release date (formatted by the backend as `dd-MM-yyyy`)
+- Update and Delete buttons (placeholder)
+
+Each product card on the Home page is wrapped in a `<Link>` that navigates to `/product/{id}` when clicked.
 
 ### Key Dependencies
 
