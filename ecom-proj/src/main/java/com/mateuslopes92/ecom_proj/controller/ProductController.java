@@ -2,9 +2,10 @@ package com.mateuslopes92.ecom_proj.controller;
 
 import com.mateuslopes92.ecom_proj.model.Product;
 import com.mateuslopes92.ecom_proj.service.ProductService;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.apache.coyote.Response;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -19,14 +20,18 @@ public class ProductController {
         this.productService = productService;
     }
 
-
-    @RequestMapping("/")
-    public String greet(){
-        return "Hello";
+    @RequestMapping("/products")
+    public ResponseEntity<List<Product>> getAllProducts(){
+        return new ResponseEntity<>(productService.getAllProducts(), HttpStatus.OK);
     }
 
-    @RequestMapping("/products")
-    public List<Product> getAllProducts(){
-        return productService.getAllProducts();
+    @GetMapping("/product/{id}")
+    public ResponseEntity<Product> getProduct(@PathVariable int id){
+        Product product = productService.getProductById(id);
+
+        if(product != null)
+            return new ResponseEntity<>(product, HttpStatus.OK);
+        else
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 }
