@@ -1,15 +1,14 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
-import Home from "./Home";
-import axios from "axios";
-
-const Navbar = ({ onSelectCategory, onSearch }) => {
+const Navbar = () => {
   const getInitialTheme = () => {
     const storedTheme = localStorage.getItem("theme");
     return storedTheme ? storedTheme : "light-theme";
   };
 
   const [theme, setTheme] = useState(getInitialTheme());
+
+
 
   const toggleTheme = () => {
     const newTheme = theme === "dark-theme" ? "light-theme" : "dark-theme";
@@ -20,6 +19,7 @@ const Navbar = ({ onSelectCategory, onSearch }) => {
   useEffect(() => {
     document.body.className = theme;
   }, [theme]);
+
 
   return (
     <>
@@ -67,6 +67,8 @@ const Navbar = ({ onSelectCategory, onSearch }) => {
                   Categories
                 </a>
 
+
+
                 <li className="nav-item"></li>
               </ul>
               <button className="theme-btn" onClick={() => toggleTheme()}>
@@ -77,14 +79,14 @@ const Navbar = ({ onSelectCategory, onSearch }) => {
                 )}
               </button>
               <div className="d-flex align-items-center cart">
-                {/* <a href="/cart" className="nav-link text-dark"> */}
-                <i
-                  className="bi bi-cart me-2"
-                  style={{ display: "flex", alignItems: "center" }}
-                >
-                  Cart
-                </i>
-                {/* </a> */}
+                <a href="/cart" className="nav-link text-dark">
+                  <i
+                    className="bi bi-cart me-2"
+                    style={{ display: "flex", alignItems: "center" }}
+                  >
+                    Cart
+                  </i>
+                </a>
 
                 <input
                   className="form-control me-2"
