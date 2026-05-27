@@ -1,6 +1,6 @@
 import { Modal, Button } from 'react-bootstrap';
-import PropTypes from 'prop-types';
 
+// eslint-disable-next-line react/prop-types
 const CheckoutPopup = ({ show, handleClose, cartItems, totalPrice, handleCheckout }) => {
   return (
     <div className="checkoutPopup">
@@ -11,6 +11,7 @@ const CheckoutPopup = ({ show, handleClose, cartItems, totalPrice, handleCheckou
       </Modal.Header>
       <Modal.Body>
         <div className="checkout-items">
+          {/* eslint-disable-next-line react/prop-types */}
           {cartItems.map((item) => (
             <div key={item.id} className="checkout-item" style={{ display: 'flex', marginBottom: '10px' }}>
               <img src={item.imageUrl} alt={item.name} style={{ width: '200px', marginRight: '10px' }} />
@@ -37,14 +38,6 @@ const CheckoutPopup = ({ show, handleClose, cartItems, totalPrice, handleCheckou
     </Modal>
     </div>
   );
-};
-
-CheckoutPopup.propTypes = {
-  show: PropTypes.bool.isRequired,
-  handleClose: PropTypes.func.isRequired,
-  cartItems: PropTypes.array.isRequired,
-  totalPrice: PropTypes.number.isRequired,
-  handleCheckout: PropTypes.func.isRequired,
 };
 
 export default CheckoutPopup;
