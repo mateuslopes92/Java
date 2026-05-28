@@ -136,15 +136,18 @@ The `Product` entity is mapped to a database table with the following fields:
 
 | Field | Type | Description |
 |---|---|---|
-| `id` | `int` | Primary key, auto-increment |
+| `id` | `Integer` | Primary key, auto-increment |
 | `name` | `String` | Product name |
 | `desc` | `String` | Product description |
 | `brand` | `String` | Brand name |
 | `price` | `BigDecimal` | Product price |
 | `category` | `String` | Product category |
-| `releaseDate` | `Date` | Release date (formatted as `dd-MM-yyyy` via `@JsonFormat`) |
+| `releaseDate` | `Date` | Release date |
 | `available` | `boolean` | Availability status |
-| `quantity` | `int` | Stock quantity |
+| `quantity` | `Integer` | Stock quantity |
+| `imageName` | `String` | Original filename of the uploaded image |
+| `imageType` | `String` | MIME type of the image (e.g. `image/jpeg`, `image/png`) |
+| `imageData` | `byte[]` (`@Lob`) | Binary image data stored in the database |
 
 ```java
 @Entity
@@ -154,17 +157,21 @@ The `Product` entity is mapped to a database table with the following fields:
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
     private String name;
     private String desc;
     private String brand;
     private BigDecimal price;
     private String category;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private Date releaseDate;
     private boolean available;
-    private int quantity;
+    private Integer quantity;
+
+    private String imageName;
+    private String imageType;
+    @Lob
+    private byte[] imageData;
 }
 ```
 
@@ -176,6 +183,8 @@ All endpoints are prefixed with `/api`. The controller is annotated with `@Cross
 |--------|----------|-------------|
 | GET | `/api/products` | List all products |
 | GET | `/api/product/{id}` | Get a single product by ID |
+| POST | `/api/product` | Add a new product with an image (multipart/form-data) |
+| GET | `/api/product/{productId}/image` | Retrieve the image binary for a specific product |
 
 ### ResponseEntity & HTTP Status Codes
 
@@ -201,6 +210,61 @@ public ResponseEntity<Product> getProduct(@PathVariable int id){
 - `200 OK` — returned when the requested product exists
 - `404 Not Found` — returned when no product matches the given ID
 - Using `ResponseEntity` gives explicit control over the response status, headers, and body
+
+### Adding Products with Images
+
+Products with images are created via a `POST /api/product` request using `multipart/form-data`:
+
+```java
+@PostMapping("/product")
+public ResponseEntity<?> addProduct(@RequestPart Product product, @RequestPart MultipartFile imageFile){
+    try {
+        Product productCreated = productService.addProduct(product, imageFile);
+        return new ResponseEntity<>(productCreated, HttpStatus.CREATED);
+    } catch (Exception e) {
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+}
+```
+
+- `@RequestPart Product product` — deserializes the product JSON from the multipart request
+- `@RequestPart MultipartFile imageFile` — captures the uploaded image file
+- Returns `201 Created` on success, `500 Internal Server Error` on failure
+
+The service layer extracts image metadata from the `MultipartFile`:
+
+```java
+public Product addProduct(Product product, MultipartFile imageFile) throws IOException {
+    product.setImageName(imageFile.getOriginalFilename());
+    product.setImageType(imageFile.getContentType());
+    product.setImageData(imageFile.getBytes());
+    return productRepository.save(product);
+}
+```
+
+- `imageName` — original filename from the client
+- `imageType` — MIME type (e.g. `image/jpeg`) for setting the correct `Content-Type` header when serving
+- `imageData` — raw byte array stored as a `@Lob` (Large Object) in the database
+
+### Image Retrieval Endpoint
+
+Images are served through a dedicated endpoint that returns the raw bytes with the correct content type:
+
+```java
+@GetMapping("product/{productId}/image")
+public ResponseEntity<byte[]> getImageByProductId(@PathVariable int productId){
+    Product product = productService.getProductById(productId);
+    byte[] imageFile = product.getImageData();
+
+    return ResponseEntity.ok()
+            .contentType(MediaType.valueOf(product.getImageType()))
+            .body(imageFile);
+}
+```
+
+- Fetches the product by ID, then extracts the stored byte array and MIME type
+- Returns the image with the correct `Content-Type` header so browsers render it properly
+- The frontend requests this endpoint with `responseType: "blob"` and creates an object URL for display
 
 ### Date Formatting with Jackson
 
@@ -249,6 +313,10 @@ Without this annotation, Jackson would serialize `Date` as a timestamp (millisec
 - **Backend Product Lookup** — A new service method (`getProductById`) and controller endpoint (`GET /api/product/{id}`) handle fetching a single product by its ID.
 - **Null Safety** — The service layer returns `null` when a product is not found, and the controller responds with `404 Not Found`.
 - **Date Formatting** — Jackson's `@JsonFormat` annotation formats the `releaseDate` field as a readable string (`dd-MM-yyyy`) instead of a raw timestamp.
+- **Image Storage** — Images are stored directly in the database as `byte[]` with `@Lob`, keeping the data fully contained without external file system dependencies.
+- **Multipart Handling** — Using `@RequestPart` with `MultipartFile` allows receiving both JSON and binary file data in a single request.
+- **Image Serving** — A dedicated image endpoint (`GET /api/product/{id}/image`) returns raw bytes with the correct `MediaType`, enabling the frontend to render images via blob URLs.
+- **UI Integration** — The frontend fetches images per-product after loading the product list, creating a seamless experience where product cards display thumbnails and detail pages show full images.
 
 ## Lessons Learned
 
@@ -259,8 +327,12 @@ Without this annotation, Jackson would serialize `Date` as a timestamp (millisec
 - **Data Formatting** — Jackson's `@JsonFormat` provides clean, human-readable date serialization. Always consider the client-side experience when formatting dates.
 - **Frontend-Backend Integration** — Connecting frontend requests (`/product/{id}`) to backend services is essential for dynamic, data-driven applications.
 - **Error Handling** — Always check for null values and handle missing resources gracefully. Returning `404 Not Found` for missing products improves user experience and client-side logic.
-- **HTTP Status Codes** — Using the correct status codes (`200 OK`, `404 Not Found`) helps manage client-side logic effectively, allowing for better error handling and user feedback.
+- **HTTP Status Codes** — Using the correct status codes (`200 OK`, `404 Not Found`, `201 Created`, `500 Internal Server Error`) helps manage client-side logic effectively, allowing for better error handling and user feedback.
 - **Iterative Development** — The development process is continuous; always look for ways to enhance functionality and user experience in future updates.
+- **Image Handling Complexity** — Managing image uploads introduces additional complexity: ensuring correct format and size, handling security concerns, and storing/retrieving binary data efficiently.
+- **Importance of Images in E-Commerce** — Including product images significantly enhances the user experience on e-commerce platforms, making the UI more informative and engaging.
+- **Frontend-Backend Integration for Images** — Sending product and image data from the frontend to the backend requires careful coordination of multipart requests (`FormData` + `Blob` on the client, `@RequestPart` on the server).
+- **Incremental Feature Building** — Building and testing the image feature incrementally (model first, then service, then controller, then frontend) helped identify and resolve issues early in the development process.
 
 ## Related Frontend
 
