@@ -39,12 +39,12 @@ src/
 
 ## Route Map
 
-| Route | Component | Description |
-|-------|-----------|-------------|
-| `/` | Home | Product catalog with image cards |
-| `/product/:id` | Product | Single product detail with image |
+| Route          | Component  | Description                          |
+| -------------- | ---------- | ------------------------------------ |
+| `/`            | Home       | Product catalog with image cards     |
+| `/product/:id` | Product    | Single product detail with image     |
 | `/add_product` | AddProduct | Form to add a new product with image |
-| `/cart` | Cart | Shopping cart with checkout |
+| `/cart`        | Cart       | Shopping cart with checkout          |
 
 ## Adding Products with Images
 
@@ -52,7 +52,7 @@ The `AddProduct` component allows admin users to create products with images in 
 
 ### Data Flow
 
-1. **Form state** — Product fields (`name`, `brand`, `desc`, `price`, `category`, `stockQuantity`, `releaseDate`, `available`) and a separate `image` file state.
+1. **Form state** — Product fields (`name`, `brand`, `desc`, `price`, `category`, `quantity`, `releaseDate`, `available`) and a separate `image` file state.
 
 2. **Image selection** — `handleImageChange` captures the selected file from the file input.
 
@@ -128,35 +128,35 @@ The `Cart` component follows the same pattern — iterating over cart items and 
 
 The `AppContext` (React Context) provides:
 
-| Value | Description |
-|-------|-------------|
-| `data` | Product list from `GET /api/products` |
-| `isError` | Fetch error flag |
-| `cart` | Shopping cart items (persisted in localStorage) |
-| `addToCart(product)` | Add item to cart |
-| `removeFromCart(id)` | Remove item from cart |
-| `clearCart()` | Empty the cart |
-| `refreshData()` | Re-fetch products from the API |
+| Value                | Description                                     |
+| -------------------- | ----------------------------------------------- |
+| `data`               | Product list from `GET /api/products`           |
+| `isError`            | Fetch error flag                                |
+| `cart`               | Shopping cart items (persisted in localStorage) |
+| `addToCart(product)` | Add item to cart                                |
+| `removeFromCart(id)` | Remove item from cart                           |
+| `clearCart()`        | Empty the cart                                  |
+| `refreshData()`      | Re-fetch products from the API                  |
 
 ## Key Dependencies
 
-| Dependency | Purpose |
-|------------|---------|
-| **Axios** | HTTP client for backend API requests |
+| Dependency       | Purpose                              |
+| ---------------- | ------------------------------------ |
+| **Axios**        | HTTP client for backend API requests |
 | **React Router** | Client-side routing (SPA navigation) |
-| **Bootstrap** | UI component library and styling |
-| **Sass** | CSS pre-processor |
+| **Bootstrap**    | UI component library and styling     |
+| **Sass**         | CSS pre-processor                    |
 
 ## Backend API
 
 This frontend communicates with the backend API at `http://localhost:8080/api`. See the [`ecom-proj` README](../ecom-proj/README.md) for full API documentation.
 
-| Method | Endpoint | Usage |
-|--------|----------|-------|
-| GET | `/api/products` | Fetch all products |
-| GET | `/api/product/{id}` | Fetch single product |
-| GET | `/api/product/{id}/image` | Fetch product image blob |
-| POST | `/api/product` | Add new product with image (multipart) |
+| Method | Endpoint                  | Usage                                  |
+| ------ | ------------------------- | -------------------------------------- |
+| GET    | `/api/products`           | Fetch all products                     |
+| GET    | `/api/product/{id}`       | Fetch single product                   |
+| GET    | `/api/product/{id}/image` | Fetch product image blob               |
+| POST   | `/api/product`            | Add new product with image (multipart) |
 
 ## Key Takeaways
 
