@@ -6,19 +6,14 @@ import axios from "axios";
 
 // eslint-disable-next-line react/prop-types
 const Home = ({ selectedCategory }) => {
-  const { data, isError, addToCart, refreshData } = useContext(AppContext);
+  const { data, isError, addToCart } = useContext(AppContext);
   const [products, setProducts] = useState([]);
-  const [isDataFetched, setIsDataFetched] = useState(false);
-
   useEffect(() => {
-    if (!isDataFetched) {
-      refreshData();
-      setIsDataFetched(true);
-    }
-  }, [refreshData, isDataFetched]);
-
-  useEffect(() => {
-    if (data && data.length > 0) {
+    if (data) {
+      if (data.length === 0) {
+        setProducts([]);
+        return;
+      }
       const fetchImagesAndUpdateProducts = async () => {
         const updatedProducts = await Promise.all(
           data.map(async (product) => {

@@ -45,7 +45,7 @@ const Product = () => {
       removeFromCart(id);
       console.log("Product deleted successfully");
       alert("Product deleted successfully");
-      refreshData();
+      await refreshData();
       navigate("/");
     } catch (error) {
       console.error("Error deleting product:", error);

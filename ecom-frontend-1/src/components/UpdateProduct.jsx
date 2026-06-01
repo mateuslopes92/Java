@@ -34,7 +34,10 @@ const UpdateProduct = () => {
         );
         const imageFile = await converUrlToFile(responseImage.data, response.data.imageName)
         setImage(imageFile);
-        setUpdateProduct(response.data);
+        setUpdateProduct({
+          ...response.data,
+          category: response.data.category?.toLowerCase() || "",
+        });
       } catch (error) {
         console.error("Error fetching product:", error);
       }
@@ -138,7 +141,7 @@ const UpdateProduct = () => {
               type="text"
               className="form-control"
               placeholder={product.desc}
-              name="description"
+              name="desc"
               onChange={handleChange}
               value={updateProduct.desc}
               id="description"
