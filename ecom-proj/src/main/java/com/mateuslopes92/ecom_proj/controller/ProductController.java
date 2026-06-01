@@ -73,4 +73,16 @@ public class ProductController {
             return new ResponseEntity<>("Failed to update", HttpStatus.BAD_REQUEST);
         }
     }
+
+    @DeleteMapping("product/{id}")
+    public ResponseEntity<String> deleteProduct(@PathVariable int id){
+        Product product = productService.getProductById(id);
+
+        if(product != null){
+            productService.deleteProduct(id);
+            return new ResponseEntity<>("Product deleted!", HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("Product not found!", HttpStatus.NOT_FOUND);
+        }
+    }
 }
