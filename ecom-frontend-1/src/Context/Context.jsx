@@ -1,15 +1,16 @@
+import { createContext, useEffect, useState } from "react";
+
 import axios from "../axios";
-import { useState, useEffect, createContext } from "react";
 
 const AppContext = createContext({
   data: [],
   isError: "",
   cart: [],
-  addToCart: () => {},
-  removeFromCart: () => {},
-  refreshData:() =>{},
-  updateStockQuantity: () =>{}
-  
+  addToCart: () => { },
+  removeFromCart: () => { },
+  refreshData: () => { },
+  updateStockQuantity: () => { }
+
 });
 
 // eslint-disable-next-line react/prop-types
@@ -37,11 +38,11 @@ export const AppProvider = ({ children }) => {
   };
 
   const removeFromCart = (productId) => {
-    console.log("productID",productId)
+    console.log("productID", productId)
     const updatedCart = cart.filter((item) => item.id !== productId);
     setCart(updatedCart);
     localStorage.setItem('cart', JSON.stringify(updatedCart));
-    console.log("CART",cart)
+    console.log("CART", cart)
   };
 
   const refreshData = async () => {
@@ -53,10 +54,10 @@ export const AppProvider = ({ children }) => {
     }
   };
 
-  const clearCart =() =>{
+  const clearCart = () => {
     setCart([]);
   }
-  
+
   useEffect(() => {
     refreshData();
   }, []);
@@ -64,9 +65,9 @@ export const AppProvider = ({ children }) => {
   useEffect(() => {
     localStorage.setItem('cart', JSON.stringify(cart));
   }, [cart]);
-  
+
   return (
-    <AppContext.Provider value={{ data, isError, cart, addToCart, removeFromCart,refreshData, clearCart  }}>
+    <AppContext.Provider value={{ data, isError, cart, addToCart, removeFromCart, refreshData, clearCart }}>
       {children}
     </AppContext.Provider>
   );

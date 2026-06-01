@@ -1,13 +1,17 @@
-import { useParams } from "react-router-dom";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+
 import AppContext from "../Context/Context";
 import axios from "../axios";
+import { useState } from "react";
 
 const Product = () => {
   const { id } = useParams();
-  const { addToCart } = useContext(AppContext);
+  const { addToCart, removeFromCart, refreshData } =
+    useContext(AppContext);
   const [product, setProduct] = useState(null);
   const [imageUrl, setImageUrl] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -34,6 +38,23 @@ const Product = () => {
 
     fetchProduct();
   }, [id]);
+
+  const deleteProduct = async () => {
+    try {
+      await axios.delete(`http://localhost:8080/api/product/${id}`);
+      removeFromCart(id);
+      console.log("Product deleted successfully");
+      alert("Product deleted successfully");
+      refreshData();
+      navigate("/");
+    } catch (error) {
+      console.error("Error deleting product:", error);
+    }
+  };
+
+  const handleEditClick = () => {
+    navigate(`/product/update/${id}`);
+  };
 
   const handlAddToCart = () => {
     addToCart(product);
@@ -66,9 +87,8 @@ const Product = () => {
           <div className="product-price">
             <span>{"$" + product.price}</span>
             <button
-              className={`cart-btn ${
-                !product.available ? "disabled-btn" : ""
-              }`}
+              className={`cart-btn ${!product.available ? "disabled-btn" : ""
+                }`}
               onClick={handlAddToCart}
               disabled={!product.available}
             >
@@ -77,13 +97,29 @@ const Product = () => {
             <h6>
               Stock Available :{" "}
               <i style={{ color: "green", fontWeight: "bold" }}>
-                {product.stockQuantity}
+                {product.quantity}
               </i>
             </h6>
             <p className="release-date">
               <h6>Product listed on:</h6>
               <i> {new Date(product.releaseDate).toLocaleDateString()}</i>
             </p>
+          </div>
+          <div className="update-button ">
+            <button
+              className="btn btn-primary"
+              type="button"
+              onClick={handleEditClick}
+            >
+              Update
+            </button>
+            <button
+              className="btn btn-primary"
+              type="button"
+              onClick={deleteProduct}
+            >
+              Delete
+            </button>
           </div>
         </div>
       </div>
