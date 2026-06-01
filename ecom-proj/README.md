@@ -185,6 +185,8 @@ All endpoints are prefixed with `/api`. The controller is annotated with `@Cross
 | GET | `/api/product/{id}` | Get a single product by ID |
 | POST | `/api/product` | Add a new product with an image (multipart/form-data) |
 | GET | `/api/product/{productId}/image` | Retrieve the image binary for a specific product |
+| PUT | `/api/product/{id}` | Update an existing product with image (multipart/form-data) |
+| DELETE | `/api/product/{id}` | Delete a product by ID |
 
 ### ResponseEntity & HTTP Status Codes
 
@@ -266,6 +268,73 @@ public ResponseEntity<byte[]> getImageByProductId(@PathVariable int productId){
 - Returns the image with the correct `Content-Type` header so browsers render it properly
 - The frontend requests this endpoint with `responseType: "blob"` and creates an object URL for display
 
+### Updating a Product
+
+Products are updated via `PUT /api/product/{id}` using `multipart/form-data` (product JSON + image):
+
+```java
+@PutMapping("/product/{id}")
+public ResponseEntity<String> updateProduct(@PathVariable int id, @RequestPart Product product, @RequestPart MultipartFile imageFile){
+    Product productUpdated = null;
+    try {
+        productUpdated = productService.updateProduct(id, product, imageFile);
+    } catch (IOException e) {
+        return new ResponseEntity<>("Failed to update", HttpStatus.BAD_REQUEST);
+    }
+
+    if(productUpdated != null){
+        return new ResponseEntity<>("Updated", HttpStatus.OK);
+    } else {
+        return new ResponseEntity<>("Failed to update", HttpStatus.BAD_REQUEST);
+    }
+}
+```
+
+The service layer updates the product data along with the new image:
+
+```java
+public Product updateProduct(int id, Product product, MultipartFile imageFile) throws IOException {
+    product.setImageData(imageFile.getBytes());
+    product.setImageName(imageFile.getName());
+    product.setImageType(imageFile.getContentType());
+    return productRepository.save(product);
+}
+```
+
+- The frontend pre-fills an update form by fetching existing product data and its image
+- Sends the modified product JSON and new image file as multipart/form-data
+- Returns `200 OK` on success, `400 Bad Request` on failure
+
+### Deleting a Product
+
+Products are deleted via `DELETE /api/product/{id}`:
+
+```java
+@DeleteMapping("product/{id}")
+public ResponseEntity<String> deleteProduct(@PathVariable int id){
+    Product product = productService.getProductById(id);
+
+    if(product != null){
+        productService.deleteProduct(id);
+        return new ResponseEntity<>("Product deleted!", HttpStatus.OK);
+    } else {
+        return new ResponseEntity<>("Product not found!", HttpStatus.NOT_FOUND);
+    }
+}
+```
+
+The service layer delegates deletion to the repository:
+
+```java
+public void deleteProduct(int id) {
+    productRepository.deleteById(id);
+}
+```
+
+- The frontend triggers deletion from the Product detail page via a "Delete" button
+- The product is removed from the cart (via context) and the page navigates back to the home screen
+- Returns `200 OK` when found and deleted, `404 Not Found` if the product doesn't exist
+
 ### Date Formatting with Jackson
 
 The `releaseDate` field uses `@JsonFormat` to control how dates are serialized to JSON:
@@ -307,6 +376,9 @@ Without this annotation, Jackson would serialize `Date` as a timestamp (millisec
 - **Model Representation** — Defining a clear entity model with JPA annotations is essential for managing application data. Using `ddl-auto=update` lets Hibernate create tables automatically.
 - **Lombok** — Significantly reduces boilerplate code (`@Data`, `@AllArgsConstructor`, `@NoArgsConstructor`), keeping the codebase clean and maintainable.
 - **RESTful Services** — Implementing endpoints with `ResponseEntity` and proper HTTP status codes ensures effective communication between frontend and backend.
+- **CRUD Operations** — The API now supports full CRUD: Create (POST), Read (GET), Update (PUT), and Delete (DELETE) for products.
+- **Multipart Updates** — The update endpoint (`PUT /api/product/{id}`) uses `@RequestPart` to receive both product JSON and image file, mirroring the create flow.
+- **Delete with Safety Checks** — The delete endpoint verifies the product exists before attempting deletion, returning `404 Not Found` for invalid IDs.
 - **Initial Data** — Use `data.sql` with `defer-datasource-initialization=true` to seed default data in H2 without schema conflicts.
 - **Testing Endpoints** — Regularly test API endpoints using Postman to ensure they return expected results.
 - **Product Detail View** — The frontend now allows users to click on individual products to view more details via a new Product component at `/product/{id}`.
@@ -317,6 +389,9 @@ Without this annotation, Jackson would serialize `Date` as a timestamp (millisec
 - **Multipart Handling** — Using `@RequestPart` with `MultipartFile` allows receiving both JSON and binary file data in a single request.
 - **Image Serving** — A dedicated image endpoint (`GET /api/product/{id}/image`) returns raw bytes with the correct `MediaType`, enabling the frontend to render images via blob URLs.
 - **UI Integration** — The frontend fetches images per-product after loading the product list, creating a seamless experience where product cards display thumbnails and detail pages show full images.
+- **Update Product Page** — A new `UpdateProduct` component at `/product/update/:id` pre-fills a form with existing product data and image, allowing users to modify and submit changes.
+- **Delete from Detail Page** — The Product detail page includes a functional Delete button that removes the product, clears it from the cart context, and navigates back to the home screen.
+- **Frontend-Backend Sync** — After delete, the frontend refreshes the product list via context (`refreshData`) to keep the UI in sync with the backend.
 
 ## Lessons Learned
 
@@ -333,6 +408,11 @@ Without this annotation, Jackson would serialize `Date` as a timestamp (millisec
 - **Importance of Images in E-Commerce** — Including product images significantly enhances the user experience on e-commerce platforms, making the UI more informative and engaging.
 - **Frontend-Backend Integration for Images** — Sending product and image data from the frontend to the backend requires careful coordination of multipart requests (`FormData` + `Blob` on the client, `@RequestPart` on the server).
 - **Incremental Feature Building** — Building and testing the image feature incrementally (model first, then service, then controller, then frontend) helped identify and resolve issues early in the development process.
+- **Update API Design** — The update endpoint requires careful handling of product data alongside image files. Using `@RequestPart` for both JSON and `MultipartFile` keeps the contract consistent with the create endpoint.
+- **Delete API Design** — Deletion is straightforward: only the product ID is needed. Always verify existence before deleting and return appropriate status codes (`200 OK` vs `404 Not Found`).
+- **Testing Features End-to-End** — After implementing update and delete, testing the full flow (add → update → delete) is essential to ensure all features work correctly together.
+- **User Feedback** — The frontend provides feedback via alerts on success/failure for update and delete operations, which is important for user experience.
+- **Code Organization** — Keeping the service layer modular (`addProduct`, `updateProduct`, `deleteProduct` as separate methods) makes the code easier to maintain and extend.
 
 ## Related Frontend
 
@@ -363,13 +443,24 @@ The front-end and back-end are fully separated and communicate exclusively via R
 
 The frontend includes a `Product` component at `/product/:id` that fetches and displays a single product's details:
 
+- Product image fetched from `GET /api/product/{id}/image` as a blob and rendered via an object URL
 - Product category, name, brand, and description
 - Price with an "Add to Cart" button
 - Stock availability and quantity
-- Release date (formatted by the backend as `dd-MM-yyyy`)
-- Update and Delete buttons (placeholder)
+- Release date (formatted as `dd-MM-yyyy`)
+- **Update button** — navigates to `/product/update/{id}` for editing
+- **Delete button** — deletes the product, removes it from cart, and navigates back to home
 
 Each product card on the Home page is wrapped in a `<Link>` that navigates to `/product/{id}` when clicked.
+
+### Update Product Page
+
+The `UpdateProduct` component at `/product/update/:id` provides a form pre-filled with the existing product data:
+
+- Fetches the current product via `GET /api/product/{id}` and its image via `GET /api/product/{id}/image`
+- Pre-populates all fields: name, brand, description, price, category, stock quantity, availability, and image preview
+- On submit, sends a `PUT /api/product/{id}` request with `multipart/form-data` containing the updated product JSON and a new image file
+- Displays success/failure alerts based on the response
 
 ### Key Dependencies
 
