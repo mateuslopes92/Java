@@ -156,8 +156,8 @@ const Navbar = ({ onSelectCategory }) => {
                   aria-label="Search"
                   value={input}
                   onChange={(e) => handleChange(e.target.value)}
-                  onFocus={() => { }}
-                  onBlur={() => { }}
+                  onFocus={() => {}}
+                  onBlur={() => {}}
                 />
                 {showSearchResults && (
                   <ul className="list-group">
