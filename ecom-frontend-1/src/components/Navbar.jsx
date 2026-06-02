@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-
 import axios from "axios";
 
 // eslint-disable-next-line react/prop-types
@@ -13,7 +12,8 @@ const Navbar = ({ onSelectCategory }) => {
   const [input, setInput] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [noResults, setNoResults] = useState(false);
-  const [showSearchResults, setShowSearchResults] = useState(false)
+  const [, setSearchFocused] = useState(false);
+  const [showSearchResults,setShowSearchResults] = useState(false)
   useEffect(() => {
     fetchData();
   }, []);
@@ -34,7 +34,7 @@ const Navbar = ({ onSelectCategory }) => {
       setShowSearchResults(true)
       try {
         const response = await axios.get(
-          `http://localhost:8080/api/products/search?name=${value}`
+          `http://localhost:8080/api/products/search?keyword=${value}`
         );
         setSearchResults(response.data);
         setNoResults(response.data.length === 0);
@@ -156,8 +156,8 @@ const Navbar = ({ onSelectCategory }) => {
                   aria-label="Search"
                   value={input}
                   onChange={(e) => handleChange(e.target.value)}
-                  onFocus={() => {}}
-                  onBlur={() => {}}
+                  onFocus={() => setSearchFocused(true)} // Set searchFocused to true when search bar is focused
+                  onBlur={() => setSearchFocused(false)} // Set searchFocused to false when search bar loses focus
                 />
                 {showSearchResults && (
                   <ul className="list-group">

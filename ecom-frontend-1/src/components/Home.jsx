@@ -3,17 +3,23 @@ import { useContext, useEffect, useState } from "react";
 import AppContext from "../Context/Context";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import unplugged from "../assets/unplugged.png"
 
 // eslint-disable-next-line react/prop-types
 const Home = ({ selectedCategory }) => {
-  const { data, isError, addToCart } = useContext(AppContext);
+  const { data, isError, addToCart, refreshData } = useContext(AppContext);
   const [products, setProducts] = useState([]);
+  const [isDataFetched, setIsDataFetched] = useState(false);
+
   useEffect(() => {
-    if (data) {
-      if (data.length === 0) {
-        setProducts([]);
-        return;
-      }
+    if (!isDataFetched) {
+      refreshData();
+      setIsDataFetched(true);
+    }
+  }, [refreshData, isDataFetched]);
+
+  useEffect(() => {
+    if (data && data.length > 0) {
       const fetchImagesAndUpdateProducts = async () => {
         const updatedProducts = await Promise.all(
           data.map(async (product) => {
@@ -47,14 +53,23 @@ const Home = ({ selectedCategory }) => {
 
   if (isError) {
     return (
-      <h2 className="text-center" style={{ padding: "10rem" }}>
-        Something went wrong...
+      <h2 className="text-center" style={{ padding: "18rem" }}>
+        <img src={unplugged} alt="Error" style={{ width: '100px', height: '100px' }} />
       </h2>
     );
   }
   return (
     <>
-      <div className="grid">
+      <div
+        className="grid"
+        style={{
+          marginTop: "64px",
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+          gap: "20px",
+          padding: "20px",
+        }}
+      >
         {filteredProducts.length === 0 ? (
           <h2
             className="text-center"
@@ -74,13 +89,16 @@ const Home = ({ selectedCategory }) => {
               <div
                 className="card mb-3"
                 style={{
-                  width: "18rem",
-                  height: "24rem",
-                  boxShadow: "rgba(0, 0, 0, 0.24) 0px 2px 3px",
+                  width: "250px",
+                  height: "360px",
+                  boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+                  borderRadius: "10px",
+                  overflow: "hidden",
                   backgroundColor: available ? "#fff" : "#ccc",
-                  margin: "10px",
                   display: "flex",
                   flexDirection: "column",
+                  justifyContent: 'flex-start',
+                  alignItems: 'stretch'
                 }}
                 key={id}
               >
@@ -93,26 +111,13 @@ const Home = ({ selectedCategory }) => {
                     alt={name}
                     style={{
                       width: "100%",
-                      height: "180px",
+                      height: "150px",
                       objectFit: "cover",
                       padding: "5px",
                       margin: "0",
+                      borderRadius: "10px 10px 10px 10px",
                     }}
                   />
-                  <div
-                    className="buttons"
-                    style={{
-                      position: "absolute",
-                      top: "25px",
-                      left: "220px",
-                      zIndex: "1",
-
-                    }}
-                  >
-                    <div className="buttons-liked">
-                      <i className="bi bi-heart"></i>
-                    </div>
-                  </div>
                   <div
                     className="card-body"
                     style={{
@@ -126,33 +131,38 @@ const Home = ({ selectedCategory }) => {
                     <div>
                       <h5
                         className="card-title"
-                        style={{ margin: "0 0 10px 0" }}
+                        style={{ margin: "0 0 10px 0", fontSize: "1.2rem" }}
                       >
                         {name.toUpperCase()}
                       </h5>
-                      <i className="card-brand" style={{ fontStyle: "italic" }}>
+                      <i
+                        className="card-brand"
+                        style={{ fontStyle: "italic", fontSize: "0.8rem" }}
+                      >
                         {"~ " + brand}
                       </i>
                     </div>
-                    <div>
+                    <hr className="hr-line" style={{ margin: "10px 0" }} />
+                    <div className="home-cart-price">
                       <h5
                         className="card-text"
-                        style={{ fontWeight: "600", margin: "5px 0" }}
+                        style={{ fontWeight: "600", fontSize: "1.1rem", marginBottom: '5px' }}
                       >
-                        {"$" + price}
+                        <i className="bi bi-currency-rupee"></i>
+                        {price}
                       </h5>
-                      <button
-                        className="btn btn-primary"
-                        style={{ width: "100%" }}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          addToCart(product);
-                        }}
-                        disabled={!available}
-                      >
-                        {available ? "Add to Cart" : "Out of Stock"}
-                      </button>
                     </div>
+                    <button
+                      className="btn-hover color-9"
+                      style={{ margin: '10px 25px 0px ' }}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        addToCart(product);
+                      }}
+                      disabled={!available}
+                    >
+                      {available ? "Add to Cart" : "Out of Stock"}
+                    </button>
                   </div>
                 </Link>
               </div>

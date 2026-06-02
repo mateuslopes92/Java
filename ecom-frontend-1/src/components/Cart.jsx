@@ -95,10 +95,11 @@ const Cart = () => {
   const handleCheckout = async () => {
     try {
       for (const item of cartItems) {
-        const { ...rest } = item;
-        const updatedquantity = item.quantity - item.quantity;
+        // eslint-disable-next-line no-unused-vars
+        const { imageUrl, imageName, imageData, imageType, quantity, ...rest } = item;
+        const updatedStockQuantity = item.quantity - item.quantity;
 
-        const updatedProductData = { ...rest, quantity: updatedquantity };
+        const updatedProductData = { ...rest, quantity: updatedStockQuantity };
         console.log("updated product data", updatedProductData)
 
         const cartProduct = new FormData();
@@ -146,11 +147,6 @@ const Cart = () => {
                   style={{ display: "flex", alignContent: "center" }}
                   key={item.id}
                 >
-                  <div className="buttons">
-                    <div className="buttons-liked">
-                      <i className="bi bi-heart"></i>
-                    </div>
-                  </div>
                   <div>
                     <img
                       src={item.imageUrl}
