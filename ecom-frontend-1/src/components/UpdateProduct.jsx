@@ -1,9 +1,12 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 
+import AppContext from "../Context/Context";
 import axios from "axios";
-import { useParams } from "react-router-dom";
 
 const UpdateProduct = () => {
+  const { refreshData } = useContext(AppContext);
+  const navigate = useNavigate();
   const { id } = useParams();
   const [product, setProduct] = useState({});
   const [image, setImage] = useState();
@@ -78,7 +81,8 @@ const UpdateProduct = () => {
       })
       .then(() => {
         console.log("Product updated successfully:", updatedProduct);
-        alert("Product updated successfully!");
+        refreshData();
+        navigate("/");
       })
       .catch((error) => {
         console.error("Error updating product:", error);

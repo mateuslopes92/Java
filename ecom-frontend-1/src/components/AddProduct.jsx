@@ -1,8 +1,12 @@
-import React, { useState } from "react";
+import { useContext, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
+import AppContext from "../Context/Context";
 import axios from "axios";
 
 const AddProduct = () => {
+  const { refreshData } = useContext(AppContext);
+  const navigate = useNavigate();
   const [product, setProduct] = useState({
     name: "",
     brand: "",
@@ -42,7 +46,8 @@ const AddProduct = () => {
       })
       .then((response) => {
         console.log("Product added successfully:", response.data);
-        alert("Product added successfully");
+        refreshData();
+        navigate("/");
       })
       .catch((error) => {
         console.error("Error adding product:", error);
