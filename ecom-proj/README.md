@@ -114,7 +114,25 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
 }
 ```
 
-No manual SQL or implementation code needed. The interface inherits `findAll`, `findById`, `save`, `deleteById`, and more.
+No manual SQL or implementation code needed for standard CRUD. The interface inherits `findAll`, `findById`, `save`, `deleteById`, and more.
+
+Custom queries can be added using the `@Query` annotation with JPQL:
+
+```java
+@Repository
+public interface ProductRepository extends JpaRepository<Product, Integer> {
+
+    @Query("SELECT p from Product p WHERE " +
+            "LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+            "LOWER(p.desc) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+            "LOWER(p.brand) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+            "LOWER(p.category) LIKE LOWER(CONCAT('%', :keyword, '%'))")
+    List<Product> searchProducts(String keyword);
+}
+```
+
+- **JPQL** references entity class names and field names (`Product`, `p.name`) — not database table/column names
+- The `searchProducts` method enables partial, case-insensitive matching across name, description, brand, and category
 
 ## Initial Data (data.sql)
 
@@ -182,6 +200,7 @@ All endpoints are prefixed with `/api`. The controller is annotated with `@Cross
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | GET | `/api/products` | List all products |
+| GET | `/api/products/search?keyword=` | Search products by name, description, brand, or category |
 | GET | `/api/product/{id}` | Get a single product by ID |
 | POST | `/api/product` | Add a new product with an image (multipart/form-data) |
 | GET | `/api/product/{productId}/image` | Retrieve the image binary for a specific product |
@@ -267,6 +286,35 @@ public ResponseEntity<byte[]> getImageByProductId(@PathVariable int productId){
 - Fetches the product by ID, then extracts the stored byte array and MIME type
 - Returns the image with the correct `Content-Type` header so browsers render it properly
 - The frontend requests this endpoint with `responseType: "blob"` and creates an object URL for display
+
+### Search Products
+
+Products can be searched via `GET /api/products/search?keyword=`:
+
+```java
+@GetMapping("/products/search")
+public ResponseEntity<List<Product>> searchProducts(@RequestParam String keyword){
+    System.out.println("Searching with " + keyword);
+    List<Product> products = productService.searchProducts(keyword);
+    return new ResponseEntity<>(products, HttpStatus.OK);
+}
+```
+
+The repository uses a custom JPQL query to search across multiple fields with case-insensitive matching:
+
+```java
+@Query("SELECT p from Product p WHERE " +
+        "LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+        "LOWER(p.desc) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+        "LOWER(p.brand) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+        "LOWER(p.category) LIKE LOWER(CONCAT('%', :keyword, '%'))")
+List<Product> searchProducts(String keyword);
+```
+
+- **JPQL** uses Java class and field names (`Product`, `p.name`) instead of database table and column names — it is database-agnostic and object-oriented
+- **`LOWER()`** on both sides of the comparison makes the search case-insensitive
+- **`CONCAT('%', :keyword, '%')`** wraps the keyword with wildcards for partial matching (a search for "phone" matches "Headphone" and "Smartphone")
+- The frontend sends search requests as the user types, displaying a dropdown of matching products in the navbar
 
 ### Updating a Product
 
@@ -379,6 +427,10 @@ Without this annotation, Jackson would serialize `Date` as a timestamp (millisec
 - **CRUD Operations** — The API now supports full CRUD: Create (POST), Read (GET), Update (PUT), and Delete (DELETE) for products.
 - **Multipart Updates** — The update endpoint (`PUT /api/product/{id}`) uses `@RequestPart` to receive both product JSON and image file, mirroring the create flow.
 - **Delete with Safety Checks** — The delete endpoint verifies the product exists before attempting deletion, returning `404 Not Found` for invalid IDs.
+- **Search with JPQL** — Custom `@Query` with JPQL enables searching across multiple fields (`name`, `desc`, `brand`, `category`) without writing database-specific SQL.
+- **Case-Insensitive Search** — Wrapping both the column and keyword with `LOWER()` ensures searches are case-insensitive, improving user experience.
+- **Partial Matching** — `CONCAT('%', :keyword, '%')` enables partial matches so searching "phone" finds both "Headphone" and "Smartphone".
+- **Frontend Search UX** — The navbar search input triggers API calls as the user types and shows a dropdown of matching results with links to product pages.
 - **Initial Data** — Use `data.sql` with `defer-datasource-initialization=true` to seed default data in H2 without schema conflicts.
 - **Testing Endpoints** — Regularly test API endpoints using Postman to ensure they return expected results.
 - **Product Detail View** — The frontend now allows users to click on individual products to view more details via a new Product component at `/product/{id}`.
@@ -413,6 +465,9 @@ Without this annotation, Jackson would serialize `Date` as a timestamp (millisec
 - **Testing Features End-to-End** — After implementing update and delete, testing the full flow (add → update → delete) is essential to ensure all features work correctly together.
 - **User Feedback** — The frontend provides feedback via alerts on success/failure for update and delete operations, which is important for user experience.
 - **Code Organization** — Keeping the service layer modular (`addProduct`, `updateProduct`, `deleteProduct` as separate methods) makes the code easier to maintain and extend.
+- **Building Search Features** — Implementing a search feature requires both backend and frontend adjustments: a JPQL query in the repository, a service method, a controller endpoint, and a search UI in the frontend.
+- **Testing Search** — Test search with various inputs (partial words, different cases, multiple matching fields) to ensure it works as expected.
+- **User Experience** — A well-designed search feature with real-time suggestions significantly improves the user experience by providing quick and relevant results.
 
 ## Related Frontend
 
@@ -461,6 +516,16 @@ The `UpdateProduct` component at `/product/update/:id` provides a form pre-fille
 - Pre-populates all fields: name, brand, description, price, category, stock quantity, availability, and image preview
 - On submit, sends a `PUT /api/product/{id}` request with `multipart/form-data` containing the updated product JSON and a new image file
 - Displays success/failure alerts based on the response
+
+### Navbar Search
+
+The navbar includes a search input that provides real-time suggestions:
+
+- As the user types, `handleChange` sends a request to `GET /api/products/search?keyword={value}`
+- Results are displayed in a dropdown list below the search bar
+- Each result links to the product detail page at `/product/{id}`
+- If no products match, a "No Product with such Name" message is shown
+- The search bar clears results when empty
 
 ### Key Dependencies
 
