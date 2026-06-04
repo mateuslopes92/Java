@@ -1,4 +1,3 @@
-import "./App.css";
 import { useState } from "react";
 import Home from "./components/Home";
 import Navbar from "./components/Navbar";
@@ -11,7 +10,7 @@ import { AppProvider } from "./Context/Context";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
-import 'bootstrap/dist/css/bootstrap.min.css';
+import "./App.css";
 
 
 function App() {

@@ -14,7 +14,6 @@ const Cart = () => {
 
   useEffect(() => {
     const fetchImagesAndUpdateCart = async () => {
-      console.log("Cart", cart);
       try {
         const response = await axios.get("http://localhost:8080/api/products");
         const backendProductIds = response.data.map((product) => product.id);
@@ -37,7 +36,6 @@ const Cart = () => {
             }
           })
         );
-        console.log("cart", cart)
         setCartItems(cartItemsWithImages);
       } catch (error) {
         console.error("Error fetching product data:", error);
@@ -76,7 +74,6 @@ const Cart = () => {
     setCartItems(newCartItems);
   };
 
-
   const handleDecreaseQuantity = (itemId) => {
     const newCartItems = cartItems.map((item) =>
       item.id === itemId
@@ -100,7 +97,6 @@ const Cart = () => {
         const updatedStockQuantity = item.quantity - item.quantity;
 
         const updatedProductData = { ...rest, quantity: updatedStockQuantity };
-        console.log("updated product data", updatedProductData)
 
         const cartProduct = new FormData();
         cartProduct.append("imageFile", cartImage);
@@ -135,35 +131,26 @@ const Cart = () => {
       <div className="shopping-cart">
         <div className="title">Shopping Bag</div>
         {cartItems.length === 0 ? (
-          <div className="empty" style={{ textAlign: "left", padding: "2rem" }}>
+          <div className="empty">
             <h4>Your cart is empty</h4>
           </div>
         ) : (
           <>
             {cartItems.map((item) => (
-              <li key={item.id} className="cart-item">
-                <div
-                  className="item"
-                  style={{ display: "flex", alignContent: "center" }}
-                  key={item.id}
-                >
-                  <div>
-                    <img
-                      src={item.imageUrl}
-                      alt={item.name}
-                      className="cart-item-image"
-                    />
-                  </div>
+              <div key={item.id} className="cart-item">
+                <div className="item">
+                  <img
+                    src={item.imageUrl}
+                    alt={item.name}
+                    className="cart-item-image"
+                  />
                   <div className="description">
                     <span>{item.brand}</span>
                     <span>{item.name}</span>
                   </div>
-
                   <div className="quantity">
                     <button
-                      className="plus-btn"
                       type="button"
-                      name="button"
                       onClick={() => handleIncreaseQuantity(item.id)}
                     >
                       <i className="bi bi-plus-square-fill"></i>
@@ -175,16 +162,13 @@ const Cart = () => {
                       readOnly
                     />
                     <button
-                      className="minus-btn"
                       type="button"
-                      name="button"
                       onClick={() => handleDecreaseQuantity(item.id)}
                     >
                       <i className="bi bi-dash-square-fill"></i>
                     </button>
                   </div>
-
-                  <div className="total-price " style={{ textAlign: "center" }}>
+                  <div className="total-price">
                     ${item.price * item.quantity}
                   </div>
                   <button
@@ -194,16 +178,18 @@ const Cart = () => {
                     <i className="bi bi-trash3-fill"></i>
                   </button>
                 </div>
-              </li>
+              </div>
             ))}
             <div className="total">Total: ${totalPrice}</div>
-            <Button
-              className="btn btn-primary"
-              style={{ width: "100%" }}
-              onClick={() => setShowModal(true)}
-            >
-              Checkout
-            </Button>
+            <div className="checkout-button">
+              <Button
+                className="btn btn-primary"
+                style={{ width: "100%", maxWidth: "400px" }}
+                onClick={() => setShowModal(true)}
+              >
+                Checkout
+              </Button>
+            </div>
           </>
         )}
       </div>
