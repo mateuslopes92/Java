@@ -13,33 +13,33 @@ This project was created using `https://start.spring.io/` with:
 
 ## What is Spring Security?
 
-Spring Security is the **standard for securing Spring-based applications**.
+Spring Security is a framework for **authentication** (who are you?) and **authorization** (what can you do?) in Java applications.
 
-Key concepts:
-- **Authentication** – verifying who the user is (login)
-- **Authorization** – checking what the user can access (roles/permissions)
-- **Security Filters** – intercepts requests before they reach controllers
-- **Security Context** – holds the authenticated user's information
+It works through a **chain of filters** that intercept every HTTP request before it reaches the controller:
+
+```
+Request → Security Filters → Controller → Response
+```
+
+Each filter checks something (login state, permissions, etc.). If a check fails, the request is rejected.
 
 ---
 
-## Default Behavior (No Custom Config)
+## What's in the code
 
-By default, Spring Security:
-- Protects **all endpoints**
-- Requires **basic authentication** for every request
-- Generates a random password at startup (logged in the console)
-- Default username is `user`
+### SpringSecurityApplication.java
+```java
+@SpringBootApplication
+public class SpringSecurityApplication {
 
-When you start the application, you'll see in the logs:
+	public static void main(String[] args) {
+		SpringApplication.run(SpringSecurityApplication.class, args);
+	}
+
+}
 ```
-Using generated security password: <random-uuid>
-```
 
----
-
-## Basic Controller Example
-
+### HelloController.java
 ```java
 @RestController
 public class HelloController {
@@ -51,67 +51,4 @@ public class HelloController {
 }
 ```
 
-With Spring Security on the classpath, accessing `GET /` will prompt for credentials before returning "Hello Security".
-
----
-
-## How Spring Security Works (Filter Chain)
-
-Spring Security works through a **chain of filters** that intercept HTTP requests:
-
-```
-Request → SecurityFilterChain → Controller → Response
-```
-
-Each filter in the chain checks something:
-- Authentication filters check if the user is logged in
-- Authorization filters check if the user has permission
-- If a filter fails, the request is rejected (401 Unauthorized or 403 Forbidden)
-
----
-
-## Key Components
-
-### SecurityFilterChain
-
-Defines **which requests are secured** and **how**.
-
-```java
-@Configuration
-@EnableWebSecurity
-public class SecurityConfig {
-
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
-            .authorizeHttpRequests(auth -> auth
-                .anyRequest().authenticated()
-            )
-            .formLogin(Customizer.withDefaults())
-            .httpBasic(Customizer.withDefaults());
-
-        return http.build();
-    }
-}
-```
-
-### AuthenticationManager
-
-Handles the **authentication logic** (validating username/password).
-
----
-
-## Summary
-
-Spring Security provides:
-- **Default security** out of the box (no config needed to get started)
-- **Customizable security rules** via `SecurityFilterChain`
-- **Multiple authentication methods** (form login, HTTP Basic, OAuth2, etc.)
-- **Role-based authorization** to restrict access by user roles
-
-As the course progresses, more topics will be added:
-- In-memory and JDBC user details
-- Custom login pages
-- CSRF protection
-- Method-level security
-- JWT and OAuth2
+With Spring Security on the classpath, the `/` endpoint is automatically protected and requires authentication to access.
