@@ -1,4 +1,4 @@
-package com.mateuslopes92.SpringSecurity;
+package com.mateuslopes92.SpringSecurity.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.GetMapping;

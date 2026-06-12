@@ -1,5 +1,6 @@
-package com.mateuslopes92.SpringSecurity;
+package com.mateuslopes92.SpringSecurity.controller;
 
+import com.mateuslopes92.SpringSecurity.model.Student;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.GetMapping;

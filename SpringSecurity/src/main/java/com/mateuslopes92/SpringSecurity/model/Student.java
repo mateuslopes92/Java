@@ -1,4 +1,4 @@
-package com.mateuslopes92.SpringSecurity;
+package com.mateuslopes92.SpringSecurity.model;
 
 public class Student {
     private int id;
