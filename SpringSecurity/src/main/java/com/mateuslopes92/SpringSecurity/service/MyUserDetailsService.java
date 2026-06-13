@@ -1,5 +1,6 @@
 package com.mateuslopes92.SpringSecurity.service;
 
+import com.mateuslopes92.SpringSecurity.model.UserPrincipal;
 import com.mateuslopes92.SpringSecurity.model.Users;
 import com.mateuslopes92.SpringSecurity.repo.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
