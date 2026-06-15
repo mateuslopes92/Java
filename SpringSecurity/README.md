@@ -111,14 +111,227 @@ public class StudentController {
 - `GET /csrf-token` — returns the server's CSRF token (obtained from the `_csrf` request attribute).
 - `POST /students` — requires a valid CSRF token. Without it, Spring Security returns **403 Forbidden**.
 
-To test with `curl`:
-```bash
-# 1. Authenticate and get a session cookie + CSRF token
-curl -v -u user:password http://localhost:8080/csrf-token
+---
 
-# 2. Use the CSRF token from the response to POST a new student
+## SecurityConfig — Custom Filter Chain
+
+`SecurityConfig.java` defines a custom `SecurityFilterChain` that replaces Spring Boot's auto-configuration:
+
+```java
+@Configuration
+@EnableWebSecurity
+public class SecurityConfig {
+
+    @Autowired
+    private UserDetailsService userDetailsService;
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        return http
+            .csrf(customizer -> customizer.disable())
+            .authorizeHttpRequests(request -> request.anyRequest().authenticated())
+            .httpBasic(Customizer.withDefaults())
+            .sessionManagement(session ->
+                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .build();
+    }
+
+    @Bean
+    public AuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider provider =
+            new DaoAuthenticationProvider(userDetailsService);
+        provider.setPasswordEncoder(new BCryptPasswordEncoder(12));
+        return provider;
+    }
+}
+```
+
+| What | Meaning |
+|------|---------|
+| `csrf().disable()` | CSRF protection turned off (useful for APIs) |
+| `anyRequest().authenticated()` | Every endpoint requires login |
+| `httpBasic()` | HTTP Basic authentication |
+| `STATELESS` session | No `JSESSIONID` cookie — credentials sent on every request |
+| `DaoAuthenticationProvider` | Looks up users from a database via `UserDetailsService` |
+| `BCryptPasswordEncoder(12)` | Hashes passwords with BCrypt (strength 12) |
+
+There's also a commented-out `InMemoryUserDetailsManager` example — an alternative that stores users in memory instead of a database.
+
+---
+
+## Database Authentication
+
+Instead of the default in-memory user, this project authenticates against a **PostgreSQL** database using **Spring Data JPA**.
+
+### Dependencies (pom.xml)
+
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-data-jpa</artifactId>
+</dependency>
+<dependency>
+    <groupId>org.postgresql</groupId>
+    <artifactId>postgresql</artifactId>
+    <version>42.7.11</version>
+</dependency>
+```
+
+### application.properties
+
+```properties
+spring.datasource.url=jdbc:postgresql://localhost:5432/postgres
+spring.datasource.username=postgres
+spring.datasource.password=postgres
+```
+
+### Users.java — JPA Entity
+
+```java
+@Entity
+public class Users {
+    @Id
+    private int id;
+    private String username;
+    private String password;
+    // getters and setters ...
+}
+```
+
+### UserRepo.java — JPA Repository
+
+```java
+@Repository
+public interface UserRepo extends JpaRepository<Users, Integer> {
+    Users findByUsername(String username);
+}
+```
+
+---
+
+## Custom UserDetailsService
+
+Spring Security needs a `UserDetailsService` to load users during authentication. `MyUserDetailsService` implements this interface and fetches users from the database:
+
+```java
+@Service
+public class MyUserDetailsService implements UserDetailsService {
+
+    @Autowired
+    private UserRepo userRepo;
+
+    @Override
+    public UserDetails loadUserByUsername(String username)
+            throws UsernameNotFoundException {
+        Users user = userRepo.findByUsername(username);
+        if (user == null) {
+            throw new UsernameNotFoundException("user not found");
+        }
+        return new UserPrincipal(user);
+    }
+}
+```
+
+### UserPrincipal.java — UserDetails Adapter
+
+Spring Security's authentication system works with the `UserDetails` interface. `UserPrincipal` adapts the `Users` entity to this interface:
+
+```java
+public class UserPrincipal implements UserDetails {
+
+    private Users user;
+
+    public UserPrincipal(Users user) {
+        this.user = user;
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return Collections.singleton(new SimpleGrantedAuthority("USER"));
+    }
+
+    @Override
+    public String getPassword() {
+        return user.getPassword();
+    }
+
+    @Override
+    public String getUsername() {
+        return user.getUsername();
+    }
+
+    // isAccountNonExpired, isAccountNonLocked,
+    // isCredentialsNonExpired, isEnabled → all return true
+}
+```
+
+The flow is:
+```
+Request → SecurityFilterChain → DaoAuthenticationProvider
+    → MyUserDetailsService.loadUserByUsername()
+    → UserRepo.findByUsername()
+    → UserPrincipal (wraps Users entity)
+    → BCryptPasswordEncoder verifies password
+```
+
+---
+
+## User Registration
+
+Users can register via a `POST /register` endpoint. The password is hashed with BCrypt before being stored.
+
+### UserController.java
+
+```java
+@RestController
+public class UserController {
+
+    @Autowired
+    private UserService service;
+
+    @PostMapping("/register")
+    public Users register(@RequestBody Users user) {
+        return service.register(user);
+    }
+}
+```
+
+### UserService.java
+
+```java
+@Service
+public class UserService {
+
+    @Autowired
+    private UserRepo repo;
+
+    private BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
+
+    public Users register(Users user) {
+        user.setPassword(encoder.encode(user.getPassword()));
+        repo.save(user);
+        return user;
+    }
+}
+```
+
+### Testing with curl
+
+```bash
+# 1. Register a new user
+curl -X POST http://localhost:8080/register \
+  -H "Content-Type: application/json" \
+  -d '{"id": 1, "username": "mateus", "password": "test"}'
+
+# 2. Authenticate with the registered user
+curl -u mateus:test http://localhost:8080/
+
+# 3. Get CSRF token (if CSRF is enabled)
+curl -u mateus:test http://localhost:8080/csrf-token
+
+# 4. POST with CSRF token
 curl -X POST http://localhost:8080/students \
-  -u user:password \
+  -u mateus:test \
   -H "Content-Type: application/json" \
   -H "X-CSRF-TOKEN: <token>" \
   -d '{"id": 3, "name": "Anna", "marks": 90}'
