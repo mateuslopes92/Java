@@ -334,5 +334,209 @@ curl -X POST http://localhost:8080/students \
   -u mateus:test \
   -H "Content-Type: application/json" \
   -H "X-CSRF-TOKEN: <token>" \
-  -d '{"id": 3, "name": "Anna", "marks": 90}'
+  -d '{"id": 3, "name": "Anna", "marks": 90}"
+```
+
+---
+
+## JWT Authentication
+
+The project now supports **JWT (JSON Web Token)** authentication as an alternative to HTTP Basic. Users can log in to receive a token and then use it for subsequent requests.
+
+### Dependencies (pom.xml)
+
+```xml
+<dependency>
+    <groupId>io.jsonwebtoken</groupId>
+    <artifactId>jjwt-api</artifactId>
+    <version>0.12.6</version>
+</dependency>
+<dependency>
+    <groupId>io.jsonwebtoken</groupId>
+    <artifactId>jjwt-impl</artifactId>
+    <version>0.12.6</version>
+    <scope>runtime</scope>
+</dependency>
+<dependency>
+    <groupId>io.jsonwebtoken</groupId>
+    <artifactId>jjwt-jackson</artifactId>
+    <version>0.12.6</version>
+    <scope>runtime</scope>
+</dependency>
+```
+
+### Updated SecurityConfig
+
+The `SecurityConfig` now exposes `register` and `login` endpoints without authentication, adds the `JwtFilter` to the filter chain, and exposes an `AuthenticationManager` bean:
+
+```java
+@Bean
+public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    return http.csrf(customizer -> customizer.disable()).
+            authorizeHttpRequests(request ->
+                    request
+                            .requestMatchers("register", "login")
+                            .permitAll()
+                            .anyRequest()
+                            .authenticated()
+            ).
+            httpBasic(Customizer.withDefaults()).
+            sessionManagement(session ->
+                    session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .addFilter(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+            .build();
+}
+
+@Bean
+public AuthenticationManager authenticationManager(AuthenticationConfiguration config){
+    return config.getAuthenticationManager();
+}
+```
+
+| Change | Meaning |
+|--------|---------|
+| `requestMatchers("register", "login").permitAll()` | Registration and login are public |
+| `.addFilter(jwtFilter, ...)` | JWT filter runs before the standard auth filter |
+| `AuthenticationManager` bean | Needed to authenticate credentials in the login flow |
+
+### JWTService.java
+
+Generates and validates JWT tokens. On construction it creates a secure HMAC-SHA256 key:
+
+```java
+@Service
+public class JWTService {
+
+    private String secretkey = "";
+
+    public JWTService() {
+        try {
+            KeyGenerator keyGen = KeyGenerator.getInstance("HmacSHA256");
+            SecretKey sk = keyGen.generateKey();
+            secretkey = Base64.getEncoder().encodeToString(sk.getEncoded());
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public String generateToken(String username) {
+        Map<String, Object> claims = new HashMap<>();
+        return Jwts.builder()
+                .claims().add(claims)
+                .subject(username)
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + 60 * 60 * 30))
+                .and()
+                .signWith(getKey())
+                .compact();
+    }
+
+    public String extractUserName(String token) {
+        return extractClaim(token, Claims::getSubject);
+    }
+
+    public boolean validateToken(String token, UserDetails userDetails) {
+        final String userName = extractUserName(token);
+        return (userName.equals(userDetails.getUsername())
+                && !isTokenExpired(token));
+    }
+}
+```
+
+| Method | Purpose |
+|--------|---------|
+| `generateToken(username)` | Creates a signed JWT with the username as subject |
+| `extractUserName(token)` | Parses the token and returns the subject (username) |
+| `validateToken(token, userDetails)` | Checks the username matches and the token isn't expired |
+
+### JwtFilter.java — OncePerRequestFilter
+
+Intercepts every request, extracts the Bearer token from the `Authorization` header, validates it, and sets the Spring Security authentication context:
+
+```java
+@Component
+public class JwtFilter extends OncePerRequestFilter {
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest request,
+            HttpServletResponse response, FilterChain filterChain) {
+
+        String authHeader = request.getHeader("Authorization");
+        String token = null;
+        String username = null;
+
+        if (authHeader != null && authHeader.startsWith("Bearer")) {
+            token = authHeader.substring(7);
+            username = jwtService.extractUserName(token);
+        }
+
+        if (username != null
+                && SecurityContextHolder.getContext().getAuthentication() == null) {
+            UserDetails userDetails = context
+                    .getBean(MyUserDetailsService.class)
+                    .loadUserByUsername(username);
+
+            if (jwtService.validateToken(token, userDetails)) {
+                UsernamePasswordAuthenticationToken authToken =
+                        new UsernamePasswordAuthenticationToken(
+                                userDetails, null, userDetails.getAuthorities());
+                authToken.setDetails(
+                        new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(authToken);
+            }
+        }
+        filterChain.doFilter(request, response);
+    }
+}
+```
+
+The filter flow:
+
+```
+Request → JwtFilter → extracts Bearer token → validates JWT
+    → sets SecurityContext → request reaches controller
+```
+
+### Login Endpoint
+
+`UserController` now has a `POST /login` endpoint:
+
+```java
+@PostMapping("/login")
+public String login(@RequestBody Users user) {
+    return service.verify(user);
+}
+```
+
+`UserService.verify()` authenticates credentials and returns a JWT:
+
+```java
+public String verify(Users user) {
+    Authentication authentication = authManager.authenticate(
+            new UsernamePasswordAuthenticationToken(
+                    user.getUsername(), user.getPassword()));
+    if (authentication.isAuthenticated()) {
+        return jwtService.generateToken(user.getUsername());
+    } else {
+        return "fail";
+    }
+}
+```
+
+### Testing with curl
+
+```bash
+# 1. Register a new user
+curl -X POST http://localhost:8080/register \
+  -H "Content-Type: application/json" \
+  -d '{"id": 1, "username": "mateus", "password": "test"}'
+
+# 2. Login to get a JWT token
+curl -X POST http://localhost:8080/login \
+  -H "Content-Type: application/json" \
+  -d '{"username": "mateus", "password": "test"}'
+# Response: eyJhbGciOiJIUzI1NiJ9...
+
+# 3. Use the JWT token for authenticated requests
+curl -H "Authorization: Bearer <token>" http://localhost:8080/students
 ```
